@@ -12,7 +12,9 @@ You will find our documentation here.
 
 Authors: Agathe Denis (@agathedenis), Victor Ho (@vho97) and Xuan Zhu (@xzhu19)
 
-Create pages: Why this paper, Summary of the paper, Replication results at a glance, Detailed replication results 
+Create pages: Why this paper, Summary of the paper, Replication results at a glance, Detailed replication results
+
+<a href="./why-this-paper">Go to next page</a> 
 
 ```@autodocs
 Modules = [Replication_of_Sieg_Yoon_2017]
