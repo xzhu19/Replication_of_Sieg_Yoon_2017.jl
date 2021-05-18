@@ -1,6 +1,8 @@
+---
 layout: page
 title: "Why this paper"
 permalink: /why-this-paper/
+---
 
 # Example
 
