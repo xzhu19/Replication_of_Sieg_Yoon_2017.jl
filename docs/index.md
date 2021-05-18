@@ -17,8 +17,8 @@ Create pages: Why this paper, Summary of the paper, Replication results at a gla
 <a href="./why-this-paper">Go to next page</a> 
 
 ```@autodocs
-Modules = [Replication_of_Sieg_Yoon_2017]
+Modules = [testdocs]
 ```
-
+Modules = [Replication_of_Sieg_Yoon_2017]
 
 end
