@@ -15,6 +15,6 @@ options = optimoptions('fsolve','TolFun',1.0e-10,'Display','off')
 [x,fval] = fsolve(@myfun_ntl2,x0,options)
 
 # Update election standards
-n=n_app
+n = n_app
 
 end
