@@ -71,20 +71,20 @@ end
 function chfc2(v1, v2, T, m)
     tol = 0.01
     trace = 0
-    t1 = (linspace(-T,T,m))'
+    t1 = transpose(LinRange(-T,T,m))
     f1 = ones(m, 1)
     f2 = ones(m, 1)
     f3 = ones(m, 1)
     k = 1
-    while k<=m
+    while k <= m
         p = 0
         c1 = quad(@cch2,0,t1(k,1),tol,trace,v1,v2,p)
         p = 1
         c2 = quad(@cch2,0,t1(k,1),tol,trace,v1,v2,p)
-        f1(k,1) = exp(c1+1i*c2)
-        (w,v,dw) = chf1(t1(k,1),v1,v2)
-        f2(k,1) = v/f1(k,1)    
-        f3(k,1) = w/f1(k,1)
+        f1(k, 1) = exp(c1+1i*c2)
+        (w, v, dw) = chf1(t1(k,1), v1, v2)
+        f2(k, 1) = v/f1(k, 1)    
+        f3(k, 1) = w/f1(k, 1)
         k = k + 1
     end
 
@@ -94,7 +94,7 @@ end
 function chfc3(v1, v2, v3, T, m)
     tol = 0.01
     trace = 0
-    t1 = (linspace(-T,T,m))'
+    t1 = transpose(LinRange(-T,T,m))
     f1 = ones(m, 1)
     f2 = ones(m, 1)
     f3 = ones(m, 1)
@@ -115,13 +115,13 @@ function chfc3(v1, v2, v3, T, m)
 end
 
 function mycon(x)
-    x0 = x(1)
-    x1 = x(2)
-    x2 = x(3)
-    x3 = x(4)
-    x4 = x(5)
-    mu = x(6)
-    sig = x(7)
+    x0 = x[1]
+    x1 = x[2]
+    x2 = x[3]
+    x3 = x[4]
+    x4 = x[5]
+    mu = x[6]
+    sig = x[7]
     
     c = []
     ceq = x0^2*sqrt(pi)*sig + (x1^2+2*x0*x2)*sqrt(pi)*sig^3/2 + (x2^2 + 2*x0*x4 + 2*x1*x3)*sqrt(pi)*sig^5*3/4 + (x3^2 + 2*x2*x4)*sqrt(pi)*sig^7*15/8 + (x4^2)*sqrt(pi)*sig^9*105/16 - 1
