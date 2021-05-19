@@ -1,7 +1,5 @@
 # Replication of Sieg and Yoon (2017)
 
-## NOTE: REMEMBER TO COPY THIS AS A README
-
 > This replication study was part of our evaluation for the course [Numerical Methods](https://floswald.github.io/NumericalMethods/) at SciencesPo Paris in Spring 2021
 
 In this replication study, we take advantage of Julia in order to. Please note that while we find almost identical results in terms of model solutions for the numerical values, the differences in simulation results are larger.
