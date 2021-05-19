@@ -1,4 +1,7 @@
 module fun_v_diff_r
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export v_diff_r
 
 using GridInterpolation 
 ##Importing Global variables

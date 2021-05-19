@@ -1,4 +1,7 @@
 module fun_v_snp_up
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export v_snp_up
 
 function v_snp_up(x)
     global beta p_d vvd vvr x_grid a_i lambda a_grid ecost_r
@@ -8,8 +11,8 @@ function v_snp_up(x)
     vd = interp1(x_grid,vvd,x)
     vr = interp1(x_grid,vvr,x)
 
-    fun1 = y -> (fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2)
-    fun2 = y -> y.*(fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2)
+    fun1 = y -> (fxr[1] + fxr[2]*(y-fxr[6]) + fxr[3]*(y-fxr[6]).^2 + fxr[4]*(y-fxr[6]).^3 +fxr[5]*(y-fxr[6]).^4).^2.*exp(-(y-fxr[6]).^2/fxr[7]^2)
+    fun2 = y -> y.*(fxr[1] + fxr[2]*(y-fxr[6]) + fxr[3]*(y-fxr[6]).^2 + fxr[4]*(y-fxr[6]).^3 +fxr[5]*(y-fxr[6]).^4).^2.*exp(-(y-fxr[6]).^2/fxr[7]^2)
 
 
     p5r = integral(fun1,u_r(a_i),u_r(a_i)+y_r(a_i))

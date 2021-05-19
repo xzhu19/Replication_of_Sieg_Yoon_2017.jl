@@ -1,4 +1,8 @@
 module fun_v_diff_d
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export v_diff_d
+
 global beta p_d  xt_1 vvd vvr x_grid at_1 lambda ecost_d
 
 using GridInterpolations

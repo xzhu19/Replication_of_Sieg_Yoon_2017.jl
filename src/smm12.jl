@@ -1,4 +1,7 @@
 module fun_smm12
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export smm12
 
 function smm12(x)
     # Global variables
@@ -24,21 +27,21 @@ function smm12(x)
         lambda   = x(3)
         ecost_d  = 0.0
         ecost_r  = 0.0
-        sigma_pd = x(4)
+        sigma_pd = x[4]
         y_d      = (x(1) + lambda*a_grid) # beta*y_d
         y_r      = (x(2) + lambda*a_grid) # beta*y_r
     elseif op_model == 2 
         lambda   = 0
         ecost_d  = 0
         ecost_r  = 0
-        sigma_pd = x(3)
+        sigma_pd = x[3]
         y_d      = (x(1) + lambda*a_grid) # beta*y_d
         y_r      = (x(2) + lambda*a_grid) # beta*y_r
     elseif op_model == 3 
-        lambda   = x(3)
-        ecost_d  = x(4)
-        ecost_r  = x(5)
-        sigma_pd = x(6)
+        lambda   = x[3]
+        ecost_d  = x[4]
+        ecost_r  = x[5]
+        sigma_pd = x[6]
         y_d      = (x(1) + lambda*a_grid) # beta*y_d
         y_r      = (x(2) + lambda*a_grid) # beta*y_r
     end
@@ -71,26 +74,26 @@ function smm12(x)
     a_d = zeros(num_sim,1)
     
     for i in 1:n_app
-        a_d(uniform_d <= cdf_d(i+1) & uniform_d > cdf_d(i)) = i
-        a_r(uniform_r <= cdf_r(i+1) & uniform_r > cdf_r(i)) = i
+        a_d(uniform_d <= cdf_d(i+1) & uniform_d > cdf_d[i]) = i
+        a_r(uniform_r <= cdf_r(i+1) & uniform_r > cdf_r[i]) = i
     end
     
-    fun1 = y -> (fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2)
-    fun3 = y -> (fxd(1) + fxd(2)*(y-fxd(6)) + fxd(3)*(y-fxd(6)).^2 + fxd(4)*(y-fxd(6)).^3 +fxd(5)*(y-fxd(6)).^4).^2.*exp(-(y-fxd(6)).^2/fxd(7)^2)
+    fun1 = y -> (fxr[1] + fxr[2]*(y-fxr[6]) + fxr[3]*(y-fxr[6]).^2 + fxr[4]*(y-fxr[6]).^3 +fxr[5]*(y-fxr[6]).^4).^2.*exp(-(y-fxr[6]).^2/fxr[7]^2)
+    fun3 = y -> (fxd[1] + fxd[2]*(y-fxd[6]) + fxd[3]*(y-fxd[6]).^2 + fxd[4]*(y-fxd[6]).^3 +fxd[5]*(y-fxd[6]).^4).^2.*exp(-(y-fxd[6]).^2/fxd[7]^2)
     
     rho_r = randpdf(fun1(t3),t3,[num_sim 1])
     rho_d = randpdf(fun3(t3),t3,[num_sim 1])
     
-    p1_r = normrnd(0,sigr(1),[num_sim 4])
-    p1_d = normrnd(0,sigd(1),[num_sim 4])
-    p2_r = normrnd(0,sigr(2),[num_sim 4])
-    p2_d = normrnd(0,sigd(2),[num_sim 4])
-    p3_r = normrnd(0,sigr(3),[num_sim 4])
-    p3_d = normrnd(0,sigd(3),[num_sim 4])
-    p4_r = normrnd(0,sigr(4),[num_sim 4])
-    p4_d = normrnd(0,sigd(4),[num_sim 4])
-    p5_r = normrnd(0,sigr(5),[num_sim 4])
-    p5_d = normrnd(0,sigd(5),[num_sim 4])
+    p1_r = normrnd(0,sigr[1],[num_sim 4])
+    p1_d = normrnd(0,sigd[1],[num_sim 4])
+    p2_r = normrnd(0,sigr[2],[num_sim 4])
+    p2_d = normrnd(0,sigd[2],[num_sim 4])
+    p3_r = normrnd(0,sigr[3],[num_sim 4])
+    p3_d = normrnd(0,sigd[3],[num_sim 4])
+    p4_r = normrnd(0,sigr[4],[num_sim 4])
+    p4_d = normrnd(0,sigd[4],[num_sim 4])
+    p5_r = normrnd(0,sigr[5],[num_sim 4])
+    p5_d = normrnd(0,sigd[5],[num_sim 4])
     
     ct1 = 1
     ct2 = 1
@@ -107,60 +110,60 @@ function smm12(x)
                rho[i] = rho_d(ct1)
                a[i] = a_d(ct1)
                ct1 = ct1+1  
-               if (l_d(a(i))>u_d(a(i))) || (rho(i)<l_d(a(i))-y_d(a(i))) || (rho(i)>u_d(a(i))+y_d(a(i)))
+               if (l_d(a[i])>u_d(a[i])) || (rho[i]<l_d(a[i])-y_d(a[i])) || (rho[i]>u_d(a[i])+y_d(a[i]))
                    x[i] = rho[i]
-                   incumbent(i+1,:) = 0
-                   party(i+1,:) = 2
+                   incumbent[i+1, :] = 0
+                   party[i+1, :] = 2
                elseif rho[i] < l_d(a[i])
                    x[i] = l_d(a[i])
-                   incumbent(i+1,:) = 1
+                   incumbent[i+1, :] = 1
                elseif rho[i] > u_d(a[i])
                    x[i] = u_d(a[i])
-                   incumbent(i+1,:) = 1           
+                   incumbent[i+1, :] = 1           
                else
                    x[i] = rho[i]
-                   incumbent(i+1,:) = 1
+                   incumbent[i+1, :] = 1
                end     
            elseif party(i,1) == 2
                rho[i] = rho_r(ct2)
                a[i] = a_r(ct2)
                ct2 = ct2 + 1        
-               if (l_r(a(i))>u_r(a(i))) || (rho(i)<l_r(a(i))-y_r(a(i))) || (rho(i)>u_r(a(i))+y_r(a(i))) # extremist
-                   x[i] = rho(i)
-                   incumbent(i+1,:) = 0
-                   party(i+1,:) = 1
-               elseif rho(i)<l_r(a(i))   # left moderate
-                   x[i] = l_r(a(i))
-                   incumbent(i+1,:) = 1               
-               elseif rho(i) > u_r(a(i)) # right moderate
-                   x[i] = u_r(a(i))
-                   incumbent(i+1,:) = 1
+               if (l_r(a[i])>u_r(a[i])) || (rho[i]<l_r(a[i])-y_r(a[i])) || (rho[i]>u_r(a[i])+y_r(a[i])) # extremist
+                   x[i] = rho[i]
+                   incumbent[i+1, :] = 0
+                   party[i+1, :] = 1
+               elseif rho[i]<l_r(a[i])   # left moderate
+                   x[i] = l_r(a[i])
+                   incumbent[i+1, :] = 1               
+               elseif rho[i] > u_r(a[i]) # right moderate
+                   x[i] = u_r(a[i])
+                   incumbent[i+1, :] = 1
                else                      # centrists
-                   x(i) = rho(i)
-                   incumbent(i+1,:) = 1                    
+                   x[i] = rho[i]
+                   incumbent[i+1, :] = 1                    
                end           
            end
         elseif incumbent[i, 1] == 1 
-            rho[i] = rho[i - 1]
-            a[i] = a(i-1)
-            party(i,:) = party(i-1,:)
-            x(i) = rho(i)
-            incumbent(i+1,:) = 0
-            party(i+1,:) = randi(2)
+            rho[i] = rho[i-1]
+            a[i] = a[i-1]
+            party[i,:] = party[i-1,:]
+            x[i] = rho[i]
+            incumbent[i+1,:] = 0
+            party[i+1,:] = randi(2)
         end  
         if party[i, 1] == 1
-            p1(i,:) = x[i]         + p1_d(ct3,:)
-            p2(i,:) = mu_d(2)*x[i] + p2_d(ct3,:)
-            p3(i,:) = mu_d(3)*x[i] + a_grid(a[i])           + p3_d(ct3,:)
-            p4(i,:) = mu_d(4)*x[i] + mu2_d(4)*a_grid(a[i])  + p4_d(ct3,:)
-            p5(i,:) = mu_d(5)*x[i] + mu2_d(5)*a_grid(a[i])  + p5_d(ct3,:)
+            p1[i,:] = x[i]         + p1_d(ct3,:)
+            p2[i,:] = mu_d(2)*x[i] + p2_d(ct3,:)
+            p3[i,:] = mu_d(3)*x[i] + a_grid(a[i])           + p3_d(ct3,:)
+            p4[i,:] = mu_d(4)*x[i] + mu2_d(4)*a_grid(a[i])  + p4_d(ct3,:)
+            p5[i,:] = mu_d(5)*x[i] + mu2_d(5)*a_grid(a[i])  + p5_d(ct3,:)
             ct3 = ct3+1
         elseif party(i,1) == 2
-            p1(i,:) = x[i]         + p1_r(ct4,:)
-            p2(i,:) = mu_r(2)*x[i] + p2_r(ct4,:)
-            p3(i,:) = mu_r(3)*x[i] + a_grid(a[i])           + p3_r(ct4,:)
-            p4(i,:) = mu_r(4)*x[i] + mu2_r(4)*a_grid(a[i])  + p4_r(ct4,:)
-            p5(i,:) = mu_r(5)*x[i] + mu2_r(5)*a_grid(a[i])  + p5_r(ct4,:)       
+            p1[i,:] = x[i]         + p1_r(ct4,:)
+            p2[i,:] = mu_r(2)*x[i] + p2_r(ct4,:)
+            p3[i,:] = mu_r(3)*x[i] + a_grid(a[i])           + p3_r(ct4,:)
+            p4[i,:] = mu_r(4)*x[i] + mu2_r(4)*a_grid(a[i])  + p4_r(ct4,:)
+            p5[i,:] = mu_r(5)*x[i] + mu2_r(5)*a_grid(a[i])  + p5_r(ct4,:)       
             ct4 = ct4+1
         end     
     end
@@ -176,7 +179,6 @@ function smm12(x)
     p3v = reshape(p3,[4*num_sim,1])
     p4v = reshape(p4,[4*num_sim,1])
     p5v = reshape(p5,[4*num_sim,1])
-    
     
     partyv = reshape(party(1:num_sim,:),[4*num_sim,1])
     election_number1 = 1*(incumbent(1:num_sim,:)==0 & incumbent(2:num_sim+1,:)==1 ) + 2*(incumbent(1:num_sim,:)==1 )+3*(incumbent(1:num_sim,:)==0 & incumbent(2:num_sim+1,:)==0)
@@ -197,13 +199,13 @@ function smm12(x)
     share_all_sim = zeros(3,4)
 
     for i in 1:3    
-        ps = datav[]:,i+2]
+        ps = datav[:,i+2]
         std4 = std(ps)
     
-        id_last_1 = sum(election_number~=2 & ps<-1*std4)
-        id_last_2 = sum(election_number~=2 & ps>=-1*std4 & ps< 0)
-        id_last_3 = sum(election_number~=2 & ps>= 0 & ps< 1*std4)
-        id_last_4 = sum(election_number~=2 & ps(:,1)>= 1*std4 )
+        id_last_1 = sum(election_number!=2 & ps<-1*std4)
+        id_last_2 = sum(election_number!=2 & ps>=-1*std4 & ps< 0)
+        id_last_3 = sum(election_number!=2 & ps>= 0 & ps< 1*std4)
+        id_last_4 = sum(election_number!=2 & ps(:,1)>= 1*std4 )
     
         id_ext_1 = sum(election_number==3 & ps<-1*std4)
         id_ext_2 = sum(election_number==3 & ps>=-1*std4 & ps< 0)
@@ -220,7 +222,7 @@ function smm12(x)
     g = zeros(9,2)
     
     for j in 1:2
-        id_last_all = sum(partyv==j & election_number~=2)
+        id_last_all = sum(partyv==j & election_number!=2)
         id_ext_all = sum(partyv==j & election_number==3)
         g[j,2] = id_ext_all/id_last_all
     end
@@ -275,10 +277,10 @@ function smm12(x)
     
     
     for i in 1:n_app
-        pr1_r[i] = integral(fun1,l_r(i),u_r(i))
-        pr1_d[i] = integral(fun3,l_d(i),u_d(i))
-        pr2_r[i] = integral(fun1,l_r(i)-y_r(i),u_r(i)+y_r(i))-pr1_r(i)
-        pr2_d[i] = integral(fun3,l_d(i)-y_d(i),u_d(i)+y_d(i))-pr1_d(i)
+        pr1_r[i] = integral(fun1,l_r[i],u_r[i])
+        pr1_d[i] = integral(fun3,l_d[i],u_d[i])
+        pr2_r[i] = integral(fun1,l_r[i]-y_r[i],u_r[i]+y_r[i])-pr1_r[i]
+        pr2_d[i] = integral(fun3,l_d[i]-y_d[i],u_d[i]+y_d[i])-pr1_d[i]
     end
         
     disp('centrist D and R')
@@ -317,33 +319,33 @@ function smm12(x)
     ylabel('ideology')
     axis([-1.0 1.0 -2 2])
     
-    p1_v = p1(:)*std_last(1)
-    p2_v = p2(:)*std_last(2)
-    p3_v = p3(:)*std_last(3)*100
-    p4_v = p4(:)*std_last(4)*100
-    p5_v = p5(:)*std_last(5)
+    p1_v = p1(:)*std_last[1]
+    p2_v = p2(:)*std_last[2]
+    p3_v = p3(:)*std_last[3]*100
+    p4_v = p4(:)*std_last[4]*100
+    p5_v = p5(:)*std_last[5]
     a_v = a_grid(a)
     x_v = x
     disp('with term limit')
     mean_v = zeros(7,1)
-    mean_v(1) = mean(p1_v)
-    mean_v(2) = mean(p2_v)
-    mean_v(3) = mean(p3_v)
-    mean_v(4) = mean(p4_v)
-    mean_v(5) = mean(p5_v)
-    mean_v(6) = mean(x_v)
-    mean_v(7) = mean(a_v)
+    mean_v[1] = mean(p1_v)
+    mean_v[2] = mean(p2_v)
+    mean_v[3] = mean(p3_v)
+    mean_v[4] = mean(p4_v)
+    mean_v[5] = mean(p5_v)
+    mean_v[6] = mean(x_v)
+    mean_v[7] = mean(a_v)
     disp('mean ability')
-    disp(mean_v(7))
+    disp(mean_v[7])
     disp('mean policy')
-    disp(mean_v(1:5))
+    disp(mean_v[1:5])
     disp('std')
     std_v = zeros(5,1)
-    std_v(1) = std(p1_v)
-    std_v(2) = std(p2_v)
-    std_v(3) = std(p3_v)
-    std_v(4) = std(p4_v)
-    std_v(5) = std(p5_v)
+    std_v[1] = std(p1_v)
+    std_v[2] = std(p2_v)
+    std_v[3] = std(p3_v)
+    std_v[4] = std(p4_v)
+    std_v[5] = std(p5_v)
     disp(std_v)
     
     end

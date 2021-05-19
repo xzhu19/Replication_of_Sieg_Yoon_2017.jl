@@ -1,4 +1,7 @@
 module fun_v_snp_r
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export v_snp_r
 
 using GridInterpolations
 

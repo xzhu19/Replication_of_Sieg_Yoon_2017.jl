@@ -1,5 +1,7 @@
 module fun_snp_fit
-using Replication_of_Sieg_Yoon_2017
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export snp_fit
 
 function snp_fit(x)
     x0 = x[1]

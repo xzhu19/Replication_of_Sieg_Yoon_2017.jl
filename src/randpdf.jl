@@ -1,4 +1,5 @@
 module fun_randpdf
+export randpdf
 
 function randpdf(p,px,dim)
     # Vectorization and normalization of the input pdf

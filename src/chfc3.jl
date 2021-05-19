@@ -9,7 +9,7 @@ function chfc3(v1, v2, v3, T, m)
     f2 = ones(m, 1)
     f3 = ones(m, 1)
     k = 1
-    while k<=m
+    while k <= m
         p = 0
         c1 = quad(@cch2,0,t1(k,1),tol,trace,v1,v2,p)
         p = 1

@@ -1,5 +1,6 @@
 module code_third_stage_snp2
-using fun_nlls_snp
+include("./fun_nlls_snp.jl")
+using .fun_nlls_snp
 
 using Optim
 
@@ -36,8 +37,8 @@ pr_pos = sum(pdf_r.*(u_r > l_r))
 
 
 for k in 1:n_app
-    xr_grid(k,:) = transpose(collect(LinRange(l_r(k),u_r(k),n_grid)))
-    xd_grid(k,:) = transpose(collect(LinRange(l_d(k),u_d(k),n_grid)))
+    xr_grid(k,:) = transpose(collect(LinRange(l_r[k],u_r[k],n_grid)))
+    xd_grid(k,:) = transpose(collect(LinRange(l_d[k],u_d[k],n_grid)))
 end
 
 options = optimset('Display','off')
@@ -55,7 +56,7 @@ for k in 1:n_app
     if u_d[k] > l_d[k]
         for j in 1:n_grid
             xt_1 = xd_grid[k,j]
-            at_1 = a_grid(k)
+            at_1 = a_grid[k]
             [xx,~] = fsolve(@v_diff_d,x0,options)
             cut_d_grid[k, j] = xx
         end
@@ -74,8 +75,8 @@ for k in 1:n_app
     end
 end
 
-fr = y -> (fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2)
-fd = y -> (fxd(1) + fxd(2)*(y-fxd(6)) + fxd(3)*(y-fxd(6)).^2 + fxd(4)*(y-fxd(6)).^3 +fxd(5)*(y-fxd(6)).^4).^2.*exp(-(y-fxd(6)).^2/fxd(7)^2)
+fr = y -> (fxr[1] + fxr[2]*(y-fxr[6]) + fxr[3]*(y-fxr[6]).^2 + fxr[4]*(y-fxr[6]).^3 +fxr[5]*(y-fxr[6]).^4).^2.*exp(-(y-fxr[6]).^2/fxr[7]^2)
+fd = y -> (fxd[1] + fxd[2]*(y-fxd[6]) + fxd[3]*(y-fxd[6]).^2 + fxd[4]*(y-fxd[6]).^3 +fxd[5]*(y-fxd[6]).^4).^2.*exp(-(y-fxd[6]).^2/fxd[7]^2)
 
 for k in 1:n_app
     pud[k] = integral(fd,u_d[k], u_d[k]+y_d[k])
@@ -96,20 +97,20 @@ for i in 1:n1
                     p_grid(i,k,j)=fd(xt_1)*normpdf(p_1[i]-xt_1,0,sigd(1))*normpdf(p_2[i]-mu_d(2)*xt_1,0,sigd(2))
 
                 end
-                    prob(i,k) =  (pud(k)*normpdf(p_1[i]-u_d[k],0,sigd(1))*normpdf(p_2[i]-mu_d(2)*u_d[k],0,sigd(2))...
-                        +         pld(k)*normpdf(p_1[i]-l_d[k],0,sigd(1))*normpdf(p_2[i]-mu_d(2)*l_d[k],0,sigd(2))...
+                    prob(i,k) =  (pud[k]*normpdf(p_1[i]-u_d[k],0,sigd(1))*normpdf(p_2[i]-mu_d(2)*u_d[k],0,sigd(2))...
+                        +         pld[k]*normpdf(p_1[i]-l_d[k],0,sigd(1))*normpdf(p_2[i]-mu_d(2)*l_d[k],0,sigd(2))...
                         +         trapz(xd_grid(k,:),p_grid(i,k,:)))    
             end
         end
     else
         for k in 1:n_app
-            if (u_r(k) > l_r(k))
+            if u_r[k] > l_r[k]
                 for j in 1:n_grid
                     xt_1 = xr_grid(k,j)
-                    p_grid(i,k,j)=fr(xt_1)*normpdf(p_1(i)-xt_1,0,sigr(1))*normpdf(p_2(i)-mu_r(2)*xt_1,0,sigr(2))
+                    p_grid(i,k,j)=fr(xt_1)*normpdf(p_1[i]-xt_1,0,sigr(1))*normpdf(p_2[i]-mu_r(2)*xt_1,0,sigr(2))
                 end
-                    prob(i,k) =  (pur(k)*normpdf(p_1(i)-u_r(k),0,sigr(1))*normpdf(p_2(i)-mu_r(2)*u_r(k),0,sigr(2))...
-                        +         plr(k)*normpdf(p_1(i)-l_r(k),0,sigr(1))*normpdf(p_2(i)-mu_r(2)*l_r(k),0,sigr(2))...
+                    prob(i,k) =  (pur[k]*normpdf(p_1[i]-u_r[k],0,sigr(1))*normpdf(p_2[i]-mu_r(2)*u_r[k],0,sigr(2))...
+                        +         plr[k]*normpdf(p_1[i]-l_r[k],0,sigr(1))*normpdf(p_2[i]-mu_r(2)*l_r[k],0,sigr(2))...
                         +         trapz(xr_grid(k,:),p_grid(i,k,:)))
             end
         end
@@ -247,7 +248,7 @@ for jj in 1:num_ecost
     welfare2[jj] = trapz(grid,y2)
 end
 
-welfare0(:) =  welfare1(1)
+welfare0(:) =  welfare1[1]
 
 frac1 = p_d*frac1_d + (1-p_d)*frac1_r
 frac2 = p_d*frac2_d + (1-p_d)*frac2_r

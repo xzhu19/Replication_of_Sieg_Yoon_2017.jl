@@ -1,5 +1,7 @@
 module fun_normal_fit_r
-using Replication_of_Sieg_Yoon_2017
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
+export normal_fit_r
 
 function normal_fit_r(x)
     mu   =  0

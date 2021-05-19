@@ -1,12 +1,9 @@
 module code_find_standard_ntl
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
 
 # Solving for election standards and valufuction of median voter in no term limit case
-global n_app 
-# global u_d2 l_d2 u_r2 l_r2 
-# global a_grid
-
 # Define matrix
-
 x0[1] = -3.5
 x0[2] = -3.5
 

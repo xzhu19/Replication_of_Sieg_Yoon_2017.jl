@@ -15,7 +15,13 @@ using LinearAlgebra
 using JuMP
 using Distributions
 
-using fun_chf1, fun_cch2, fun_chfc2, fun_chfc3, fun_mycon
+include("./chf1.jl")
+include("./cch2.jl")
+include("./chfc2.jl")
+include("./chfc3.jl")
+include("./mycon.jl")
+
+using .fun_chf1, .fun_cch2, .fun_chfc2, .fun_chfc3, .fun_mycon
 
 #include("HelperFunctions.jl")
 
@@ -141,10 +147,10 @@ share_all = zeros(3,4)
 for i = 1
         ps = residual[:, 3]
         std4 = std(ps)
-        share_all[i,1] = (sum(election_number==3 & ps<-1*std4 ))/(sum(election_number~=2 & ps<-1*std4 ))
-        share_all[i,2] = (sum(election_number==3 & ps>=-1*std4 & ps< 0 ))/(sum(election_number~=2 & ps>=-1*std4 & ps< 0 ))
-        share_all[i,3] = (sum(election_number==3 & ps>= 0 & ps< 1*std4 ))/(sum(election_number~=2 & ps>= 0 & ps< 1*std4 ))
-        share_all[i,4] = (sum(election_number==3 & ps>= 1*std4 ))/(sum(election_number~=2 & ps>= 1*std4 ))
+        share_all[i,1] = (sum(election_number==3 & ps<-1*std4 ))/(sum(election_number!=2 & ps<-1*std4 ))
+        share_all[i,2] = (sum(election_number==3 & ps>=-1*std4 & ps< 0 ))/(sum(election_number!=2 & ps>=-1*std4 & ps< 0 ))
+        share_all[i,3] = (sum(election_number==3 & ps>= 0 & ps< 1*std4 ))/(sum(election_number!=2 & ps>= 0 & ps< 1*std4 ))
+        share_all[i,4] = (sum(election_number==3 & ps>= 1*std4 ))/(sum(election_number!=2 & ps>= 1*std4 ))
 end
 
 mean_1 = zeros(5,2)
@@ -173,7 +179,7 @@ end
 residual2 = residual
 
 for i in 1:5
-    residual2[:,i] = residual[:,i]*std_last(i)
+    residual2[:,i] = residual[:,i]*std_last[i]
 end
 
 # First Stage Estimation (Kotlarski)

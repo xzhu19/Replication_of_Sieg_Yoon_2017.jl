@@ -1,7 +1,8 @@
 module code_find_standard_ttl
+include("./Replication_of_Sieg_Yoon_2017.jl")
+using .Replication_of_Sieg_Yoon_2017
 
 # Solving for election standards and valufuction of median voter in 2-term limit case
-
 # Estimated densities
 x0[1] = -4.7
 x0[2] = -4.7
