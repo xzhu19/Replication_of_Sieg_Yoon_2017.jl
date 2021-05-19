@@ -204,67 +204,68 @@ function smm12(x)
         end
     end
     
-    share_all_sim= zeros(3,4);   
-    for i=1:3    
-        ps = datav(:,i+2);
-        std4 = std(ps);
+    share_all_sim = zeros(3,4)
+
+    for i in 1:3    
+        ps = datav[]:,i+2]
+        std4 = std(ps)
     
-        id_last_1 = sum(election_number~=2 & ps<-1*std4);
-        id_last_2 = sum(election_number~=2 & ps>=-1*std4 & ps< 0);
-        id_last_3 = sum(election_number~=2 & ps>= 0 & ps< 1*std4);
-        id_last_4 = sum(election_number~=2 & ps(:,1)>= 1*std4 );
+        id_last_1 = sum(election_number~=2 & ps<-1*std4)
+        id_last_2 = sum(election_number~=2 & ps>=-1*std4 & ps< 0)
+        id_last_3 = sum(election_number~=2 & ps>= 0 & ps< 1*std4)
+        id_last_4 = sum(election_number~=2 & ps(:,1)>= 1*std4 )
     
-        id_ext_1 = sum(election_number==3 & ps<-1*std4);
-        id_ext_2 = sum(election_number==3 & ps>=-1*std4 & ps< 0);
-        id_ext_3 = sum(election_number==3 & ps>= 0 & ps< 1*std4);
-        id_ext_4 = sum(election_number==3 & ps>= 1*std4 );
+        id_ext_1 = sum(election_number==3 & ps<-1*std4)
+        id_ext_2 = sum(election_number==3 & ps>=-1*std4 & ps< 0)
+        id_ext_3 = sum(election_number==3 & ps>= 0 & ps< 1*std4)
+        id_ext_4 = sum(election_number==3 & ps>= 1*std4 )
     
-        share_all_sim(i,1) = id_ext_1/id_last_1;
-        share_all_sim(i,2) = id_ext_2/id_last_2;
-        share_all_sim(i,3) = id_ext_3/id_last_3;
-        share_all_sim(i,4) = id_ext_4/id_last_4;
+        share_all_sim[i,1] = id_ext_1/id_last_1
+        share_all_sim[i,2] = id_ext_2/id_last_2
+        share_all_sim[i,3] = id_ext_3/id_last_3
+        share_all_sim[i,4] = id_ext_4/id_last_4
     end    
         
-        %% Moments
-    g= zeros(9,2);
+    # Moments
+    g = zeros(9,2)
     
-    for j=1:2
-        id_last_all = sum(partyv==j & election_number~=2 );
-        id_ext_all = sum(partyv==j & election_number==3 );
-        g(j,2) = id_ext_all/id_last_all;
+    for j in 1:2
+        id_last_all = sum(partyv==j & election_number~=2)
+        id_ext_all = sum(partyv==j & election_number==3)
+        g[j,2] = id_ext_all/id_last_all
     end
     
-    g(1,1) =  d_share ;
-    g(2,1) =  r_share  ;
+    g[1,1] =  d_share 
+    g[2,1] =  r_share 
     
-    g(3,1) = 0.5041322;
-    g(3,2) = p_d;
+    g[3,1] = 0.5041322
+    g[3,2] = p_d
     
-    % moments to identify the benefit of holding office
-    ct = 3;
-    g(ct+1,1) = std_1(1,1)/std_2(1,1);
-    g(ct+2,1) = std_1(1,2)/std_2(1,2);
+    # moments to identify the benefit of holding office
+    ct = 3
+    g(ct+1,1) = std_1(1,1)/std_2(1,1)
+    g(ct+2,1) = std_1(1,2)/std_2(1,2)
     
     g(ct+1,2) = std_1_sim(1,1)/std_2_sim(1,1);
     g(ct+2,2) = std_1_sim(1,2)/std_2_sim(1,2);
     % identification of lambda, mu25, mu26
     
     ct = 5;
-    for i = 1:1
-    g(ct+1+4*(i-1),1) = share_all(i,1);
-    g(ct+2+4*(i-1),1) = share_all(i,2);
-    g(ct+3+4*(i-1),1) = share_all(i,3);
-    g(ct+4+4*(i-1),1) = share_all(i,4);
-    g(ct+1+4*(i-1),2) = share_all_sim(i,1);
-    g(ct+2+4*(i-1),2) = share_all_sim(i,2);
-    g(ct+3+4*(i-1),2) = share_all_sim(i,3);
-    g(ct+4+4*(i-1),2) = share_all_sim(i,4);
+    for i = 1
+        g[ct+1+4*(i-1),1] = share_all[i,1]
+        g[ct+2+4*(i-1),1] = share_all[i,2]
+        g[ct+3+4*(i-1),1] = share_all[i,3]
+        g[ct+4+4*(i-1),1] = share_all[i,4]
+        g[ct+1+4*(i-1),2] = share_all_sim[i,1]
+        g[ct+2+4*(i-1),2] = share_all_sim[i,2]
+        g[ct+3+4*(i-1),2] = share_all_sim[i,3]
+        g[ct+4+4*(i-1),2] = share_all_sim[i,4]
     end
     
     
     g_diff = (g(:,1) - g(:,2));
     f = g_diff'*weight*g_diff;
-    
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Print results
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -272,23 +273,23 @@ function smm12(x)
     format short
     
     disp('model fits')
-    disp(g(1:2,:))
-    disp(g(6:9,:))
-    disp(g(4:5,:))
-    disp(g(3,:))
+    disp(g[1:2,:])
+    disp(g[6:9,:])
+    disp(g[4:5,:])
+    disp(g[3,:])
     
-    pr1_r = linspace(0,1,n_app);
-    pr1_d = linspace(0,1,n_app);
+    pr1_r = transpose(collect(LinRange(0,1,n_app)))
+    pr1_d = transpose(collect(LinRange(0,1,n_app)))
     
-    pr2_r = linspace(0,1,n_app);
-    pr2_d = linspace(0,1,n_app);
+    pr2_r = transpose(collect(LinRange(0,1,n_app)))
+    pr2_d = transpose(collect(LinRange(0,1,n_app)))
     
     
-    for i=1:n_app
-    pr1_r(i) = integral(fun1,l_r(i),u_r(i));
-    pr1_d(i) = integral(fun3,l_d(i),u_d(i));
-    pr2_r(i) = integral(fun1,l_r(i)-y_r(i),u_r(i)+y_r(i))-pr1_r(i);
-    pr2_d(i) = integral(fun3,l_d(i)-y_d(i),u_d(i)+y_d(i))-pr1_d(i); 
+    for i in 1:n_app
+        pr1_r[i] = integral(fun1,l_r(i),u_r(i));
+        pr1_d[i] = integral(fun3,l_d(i),u_d(i));
+        pr2_r[i] = integral(fun1,l_r(i)-y_r(i),u_r(i)+y_r(i))-pr1_r(i);
+        pr2_d[i] = integral(fun3,l_d(i)-y_d(i),u_d(i)+y_d(i))-pr1_d(i); 
     end
         
     disp('centrist D and R')
@@ -335,14 +336,14 @@ function smm12(x)
     a_v = a_grid(a);
     x_v = x;
     disp('with term limit')
-    mean_v = zeros(7,1);
-    mean_v(1) = mean(p1_v);
-    mean_v(2) = mean(p2_v);
-    mean_v(3) = mean(p3_v);
-    mean_v(4) = mean(p4_v);
-    mean_v(5) = mean(p5_v);
-    mean_v(6) = mean(x_v);
-    mean_v(7) = mean(a_v);
+    mean_v = zeros(7,1)
+    mean_v(1) = mean(p1_v)
+    mean_v(2) = mean(p2_v)
+    mean_v(3) = mean(p3_v)
+    mean_v(4) = mean(p4_v)
+    mean_v(5) = mean(p5_v)
+    mean_v(6) = mean(x_v)
+    mean_v(7) = mean(a_v)
     disp('mean ability')
     disp(mean_v(7))
     disp('mean policy')
@@ -357,16 +358,15 @@ function smm12(x)
     disp(std_v)
     
     end
-    %% Option to run third stage estimation
-    if op_policyexp == 1   
-    
-    disp('solve model without term limit')
-    ntl_snp2
+    # Option to run third stage estimation
+    if op_policyexp == 1     
+        disp('solve model without term limit')
+        ntl_snp2
     end
-    
+
     if op_thirdstage == 1
-    disp('estimate third stage')    
-    third_stage_snp2
+        disp('estimate third stage')    
+        third_stage_snp2
     end
     
     end

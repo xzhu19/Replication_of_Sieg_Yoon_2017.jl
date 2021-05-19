@@ -1,6 +1,6 @@
-#file: v_snp_r
+module fun_v_snp_r
 
-using GridInterpolation 
+using GridInterpolations
 
 import beta
 import p_d
@@ -16,3 +16,5 @@ vr = interpolate(x_grid, vvr, x)
 vd = interpolate(x_grid, vvd, x)
 
 function v_snp_r(x) = -abs(xt_1 -x) + lambda * at_1 -ecost_r + beta *(vd* p_d + vr *(1 -p_d))
+
+end

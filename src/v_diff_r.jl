@@ -1,4 +1,4 @@
-#FILE: v_diff_r
+module fun_v_diff_r
 
 using GridInterpolation 
 ##Importing Global variables
@@ -17,7 +17,9 @@ vr = interpolate(x_grid, vvr, x)
 vd = interpolate(x_grid, vvd, x)
 
 #v function 
-v = -abs(xt_1 - x) + lambda*at_1 + beta * (vd *p_d + vr *(1-p_d)) -ecost_r;
+v = -abs(xt_1 - x) + lambda*at_1 + beta * (vd *p_d + vr *(1-p_d)) -ecost_r
 
 # v diff function 
-function  v_diff_r(x) = v-vd;
+function  v_diff_r(x) = v-vd
+
+end

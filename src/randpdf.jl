@@ -1,7 +1,6 @@
 module fun_randpdf
 
 function randpdf(p,px,dim)
-
     # Vectorization and normalization of the input pdf
     px=px(:);
     p=p(:)./trapz(px,p(:));
@@ -17,17 +16,15 @@ function randpdf(p,px,dim)
     ind=[true; not(diff(cdfp)==0)];
 
     # and cut out the parts
-    cdfp=cdfp(ind);
-    pi=pi(ind);
-    pxi=pxi(ind);
+    cdfp=cdfp(ind)
+    pi=pi(ind)
+    pxi=pxi(ind)
 
     # generating the uniform distributed random numbers
-
-    uniformDistNum=rand(dim);
-    #disp(uniformDistNum(1))
+    uniformDistNum=rand(dim)
 
     # and distributing the numbers using cdf from input pdf
-    userDistNum=interp1(cdfp,pxi,uniformDistNum(:)','linear');
+    userDistNum=interp1(cdfp,pxi,uniformDistNum(:)','linear')
 
     # making graphs if no output exists
     if nargout==0
