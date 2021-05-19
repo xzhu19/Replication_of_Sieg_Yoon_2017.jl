@@ -1,4 +1,5 @@
 module fun_chf1
+export chf1
 
 function chf1(t2, v1, v2)
     n = size(v1)[1]

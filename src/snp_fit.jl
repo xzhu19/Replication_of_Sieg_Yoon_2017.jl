@@ -1,7 +1,7 @@
 module fun_snp_fit
+using Replication_of_Sieg_Yoon_2017
 
 function snp_fit(x)
-    global t3 kxr kxd kar kad mode
     x0 = x[1]
     x1 = x[2]
     x2 = x[3]

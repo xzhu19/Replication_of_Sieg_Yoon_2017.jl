@@ -1,4 +1,5 @@
 module fun_cch2
+export cch2
 
 function cch2(x, v1, v2, p)
     (w, v, dw) = chf1(x, v1, v2)

@@ -2,76 +2,22 @@
 
 module Replication_of_Sieg_Yoon_2017
 
+export ter, ker, mode, ted, ked, t3, kxr, kxd, kar,kad
+
 using DataFrames
 using CSV
 using Statistics
 using Plots
 using GLM
-using NLopt
+using NLopt, Optim
 using Trapz
 using LinearAlgebra
 using JuMP
 using Distributions
 
+using fun_chf1, fun_cch2, fun_chfc2, fun_chfc3, fun_mycon
+
 #include("HelperFunctions.jl")
-
-function chf1(t2, v1, v2)
-    n = size(v1)[1]
-    k1 = size(v1)[2]
-    k2 = size(v2)[2]
-    s2 = size(t2)
-
-    if s2[1] > s2[2]
-        t2 = transpose(t2)
-        d = s2[1]
-    else 
-        d = s2[2]
-    end
-
-    w = 0
-    v = 0
-    dw = 0
-    g1 = ones(1, d)
-    g2 = ones(n, 1)
-    l1 = 1
-
-    while l1 <= k1
-        l2 = 1
-        while l2 <= k2
-            w0 = sum(exp(sqrt(-1 + 0im)*kron(g2,t2).*kron(g1,v2[:,l2])), dims=1)
-            v0 = sum(exp(sqrt(-1 + 0im)*kron(g2,t2).*kron(g1,v1[:,l1])), dims=1)
-            dw0 = sum(sqrt(-1 + 0im)*kron(g1,v1[:,l1]).*exp(sqrt(-1 + 0im)*kron(g2,t2).*kron(g1,v2[:,l2])), dims=1)
-            dw = dw .+ dw0
-            w = w .+ w0
-            v = v .+ v0
-            l2 = l2 + 1
-        end
-        l1 = l1 + 1
-    end
-
-    w = w/(n*k1*k2)
-    v = v/(n*k1*k2)
-    dw = dw/(n*k1*k2)
-
-    if s2[1] > s2[2]
-        w = transpose(w)
-        v = transpose(v)
-        dw = transpose(dw)
-    end
-
-    return [w, v, dw]
-end
-
-function cch2(x, v1, v2, p)
-    (w, v, dw) = chf1(x, v1, v2)
-    rr = dw./w
-    if p == 0
-        y = real(rr)
-    else
-        y = (rr - real(rr))/sqrt(-1 + 0im)
-    end
-    return y
-end
 
 # Options TO BE MADE INTERACTIVE
 op_model = 1  # 1 : Baseline model specification / 2 : lambda = 0 / 3 : extended
@@ -337,8 +283,8 @@ for kk in 1:2
 end
 
 # Approximate distibution of ideology and competence using SNP density
-options = optimoptions('fmincon','display','off');
-A = [];b = [];Aeq = [];beq = [];lb = [];ub = []; 
+options = optimoptions('fmincon','display','off')
+A = []b = []Aeq = []beq = []lb = []ub = []
 xx_vector = zeros(4,7)
 x0=[0.5880    0.0087   -0.0617   -0.0004    0.0048   -0.2016    2.0044
     0.6078   -0.0429   -0.0723    0.0026    0.0077    0.2638    1.7891
@@ -396,7 +342,7 @@ figure
 plot(t3,fun1(t3),'Color','r','LineStyle','-','LineWidth',2)
 hold on
 plot(t3,fun3(t3),'Color','b','LineStyle','--','LineWidth',2)
-hleg = legend('Republican','Democrat');
+hleg = legend('Republican','Democrat')
 set(hleg, 'Box','off','Location','NorthEast')
 axis([-4 4 0 0.6])
 xlabel('ideology')
@@ -405,7 +351,7 @@ figure
 plot(t3,f15(t3),'Color','r','LineStyle','-','LineWidth',2)
 hold on
 plot(t3,f16(t3),'Color','b','LineStyle','--','LineWidth',2)
-hleg = legend('Republican','Democrat');
+hleg = legend('Republican','Democrat')
 set(hleg, 'Box','off','Location','NorthEast')
 axis([-4 4 0 0.6])
 xlabel ('competence')
@@ -449,9 +395,9 @@ if op_estimation == 1
     op_print_results = 1
     smm12(xx)
 elseif op_estimation==2
-    op_print_results    = 0;
-    options = psoptimset('Display','iter','MaxFunEvals',num_eval,'TolX',1d-6);
-    A =[];    b = [];    Aeq = [];    beq = [];
+    op_print_results    = 0
+    options = psoptimset('Display','iter','MaxFunEvals',num_eval,'TolX',1d-6)
+    A =[]    b = []    Aeq = []    beq = []
     LB = x0 - abs(x0)*0.2
     UB = x0 + abs(x0)*0.2
     xx = patternsearch(@smm12,x0,A,b,Aeq,beq,LB,UB,options)

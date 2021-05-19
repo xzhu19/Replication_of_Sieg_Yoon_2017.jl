@@ -11,13 +11,13 @@ function v_snp_low(x)
     fun1 = y -> (fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2)
     fun2 = y -> y.*(fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2)
     
-    p5r = integral(fun1,l_r(a_i)-y_r(a_i),l_r(a_i));
-    g5r = integral(fun2,l_r(a_i)-y_r(a_i),l_r(a_i));
-    e5r = g5r/max(p5r, 0.00001);
+    p5r = integral(fun1,l_r(a_i)-y_r(a_i),l_r(a_i))
+    g5r = integral(fun2,l_r(a_i)-y_r(a_i),l_r(a_i))
+    e5r = g5r/max(p5r, 0.00001)
     
-    p6r = integral(fun1,l_r(a_i)-y_r(a_i),x);
-    g6r = integral(fun2,l_r(a_i)-y_r(a_i),x);
-    e6r = g6r/max(p6r, 0.00001);
+    p6r = integral(fun1,l_r(a_i)-y_r(a_i),x)
+    g6r = integral(fun2,l_r(a_i)-y_r(a_i),x)
+    e6r = g6r/max(p6r, 0.00001)
     
     p7r = integral(fun1,x,l_r(a_i))
     g7r = integral(fun2,x,l_r(a_i))

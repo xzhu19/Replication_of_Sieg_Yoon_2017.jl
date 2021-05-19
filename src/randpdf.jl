@@ -2,18 +2,18 @@ module fun_randpdf
 
 function randpdf(p,px,dim)
     # Vectorization and normalization of the input pdf
-    px=px(:);
-    p=p(:)./trapz(px,p(:));
+    px=px(:)
+    p=p(:)./trapz(px,p(:))
 
     # Interpolation of the input pdf for better integration with 10000 points
-    pxi=[linspace(min(px),max(px),10000)]';
-    pi=interp1(px,p,pxi,'linear');
+    pxi=[linspace(min(px),max(px),10000)]'
+    pi=interp1(px,p,pxi,'linear')
 
     # computing the cumulative distribution function for input pdf
-    cdfp = cumtrapz(pxi,pi);
+    cdfp = cumtrapz(pxi,pi)
 
     # finding the parts of cdf parallel to the X axis 
-    ind=[true; not(diff(cdfp)==0)];
+    ind=[true; not(diff(cdfp)==0)]
 
     # and cut out the parts
     cdfp=cdfp(ind)
@@ -29,8 +29,8 @@ function randpdf(p,px,dim)
     # making graphs if no output exists
     if nargout==0
         subplot(3,4,[1 2 5 6])
-        [n,xout]=hist(userDistNum,50);
-        n=n./sum(n)./(xout(2)-xout(1));
+        [n,xout]=hist(userDistNum,50)
+        n=n./sum(n)./(xout(2)-xout(1))
         bar(xout,n)
         hold on
         plot(pxi, pi./trapz(pxi,pi),'r')

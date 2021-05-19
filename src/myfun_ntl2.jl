@@ -47,8 +47,8 @@ function myfun_ntl2(x)
     
     for i in 1:n
         if (lambda*a_grid[i]-ecost_r)/(1-beta)- v_d >=0 
-            u_r[i] =  (lambda*a_grid[i]-ecost_r)-v_d*(1-beta);
-            l_r[i] = - u_r[i];
+            u_r[i] =  (lambda*a_grid[i]-ecost_r)-v_d*(1-beta)
+            l_r[i] = - u_r[i]
         else
             u_r[i] = -0.01
             l_r[i] =  0.01
@@ -73,34 +73,34 @@ function myfun_ntl2(x)
     
     for i in 1:n
         if (u_r[i] >= l_r[i])    
-            p1r[i] = integral(fun1,-inf,l_r[i]-y_r[i]);
-            p2r[i] = integral(fun1,l_r[i]-y_r[i],l_r[i]);
-            p5r[i] = integral(fun1,u_r[i],u_r[i]+y_r[i]);
-            p6r[i] = integral(fun1,u_r[i]+y_r[i],inf);
-            p3r[i] = max(0,1 - p1r[i] - p2r[i] - p5r[i] - p6r[i]);
-            g1r[i] = integral(fun2,-inf,l_r[i]-y_r[i]);
-            g2r[i] = integral(fun2,l_r[i]-y_r[i],l_r[i]);
-            g5r[i] = integral(fun2,u_r[i],u_r[i]+y_r[i]);
-            g6r[i] = integral(fun2,u_r[i]+y_r[i],inf);
-            g3r[i] = max(0,p_all_r - g1r[i] - g2r[i] - g5r[i] - g6r[i]);
+            p1r[i] = integral(fun1,-inf,l_r[i]-y_r[i])
+            p2r[i] = integral(fun1,l_r[i]-y_r[i],l_r[i])
+            p5r[i] = integral(fun1,u_r[i],u_r[i]+y_r[i])
+            p6r[i] = integral(fun1,u_r[i]+y_r[i],inf)
+            p3r[i] = max(0,1 - p1r[i] - p2r[i] - p5r[i] - p6r[i])
+            g1r[i] = integral(fun2,-inf,l_r[i]-y_r[i])
+            g2r[i] = integral(fun2,l_r[i]-y_r[i],l_r[i])
+            g5r[i] = integral(fun2,u_r[i],u_r[i]+y_r[i])
+            g6r[i] = integral(fun2,u_r[i]+y_r[i],inf)
+            g3r[i] = max(0,p_all_r - g1r[i] - g2r[i] - g5r[i] - g6r[i])
         end
     
         if u_d[i] >= l_d[i] 
-            p1d[i] = integral(fun3,-inf,l_d[i]-y_d[i]);
-            p2d[i] = integral(fun3,l_d[i]-y_d[i],l_d[i]);
-            p5d[i] = integral(fun3,u_d[i],u_d[i]+y_d[i]);
-            p6d[i] = integral(fun3,u_d[i]+y_d[i],inf);
-            p3d[i] = max(0,1 - p1d[i] - p2d[i] - p5d[i] - p6d[i]);
+            p1d[i] = integral(fun3,-inf,l_d[i]-y_d[i])
+            p2d[i] = integral(fun3,l_d[i]-y_d[i],l_d[i])
+            p5d[i] = integral(fun3,u_d[i],u_d[i]+y_d[i])
+            p6d[i] = integral(fun3,u_d[i]+y_d[i],inf)
+            p3d[i] = max(0,1 - p1d[i] - p2d[i] - p5d[i] - p6d[i])
             
-            g1d[i] = integral(fun4,-inf,l_d[i]-y_d[i]);
-            g2d[i] = integral(fun4,l_d[i]-y_d[i],l_d[i]);
-            g5d[i] = integral(fun4,u_d[i],u_d[i]+y_d[i]);
-            g6d[i] = integral(fun4,u_d[i]+y_d[i],inf);
-            g3d[i] = max(0,p_all_d - g1d[i] - g2d[i] - g5d[i] - g6d[i]);
+            g1d[i] = integral(fun4,-inf,l_d[i]-y_d[i])
+            g2d[i] = integral(fun4,l_d[i]-y_d[i],l_d[i])
+            g5d[i] = integral(fun4,u_d[i],u_d[i]+y_d[i])
+            g6d[i] = integral(fun4,u_d[i]+y_d[i],inf)
+            g3d[i] = max(0,p_all_d - g1d[i] - g2d[i] - g5d[i] - g6d[i])
         end
     end
     
-    for i=1:n
+    for i in 1:n
         if u_r[i] >= l_r[i]
             v_r_grid[i] = (p6r[i])*(lambda*a_grid[i]+beta*v_d)-g6r[i] +(p5r[i])*(-abs(u_r[i]) + lambda*a_grid[i]-beta*ecost_r)/(1-beta)+(p3r[i])*(lambda*a_grid[i]-beta*ecost_r)/(1-beta)-g3r[i]/(1-beta)+(p2r[i])*(-abs(l_r[i]) + lambda*a_grid[i]-beta*ecost_r)/(1-beta) +(p1r[i])*(lambda*a_grid[i]+beta*v_d)-g1r[i]
         else

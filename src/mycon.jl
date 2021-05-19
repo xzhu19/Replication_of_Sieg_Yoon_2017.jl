@@ -1,4 +1,5 @@
 module fun_mycon
+export mycon
 
 function mycon(x)
     x0 = x[1]

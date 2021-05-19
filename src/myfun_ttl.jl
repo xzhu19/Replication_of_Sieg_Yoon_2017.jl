@@ -60,68 +60,68 @@ function myfun_ttl(x)
     
     v_0 = v_d*p_d + (1-p_d)*v_r
     
-    fun1 = y - > (fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2) ;
-    fun2 = y - > abs(y).*(fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2) ;
-    fun3 = y - > (fxd(1) + fxd(2)*(y-fxd(6)) + fxd(3)*(y-fxd(6)).^2 + fxd(4)*(y-fxd(6)).^3 +fxd(5)*(y-fxd(6)).^4).^2.*exp(-(y-fxd(6)).^2/fxd(7)^2) ;
-    fun4 = y - > abs(y).*(fxd(1) + fxd(2)*(y-fxd(6)) + fxd(3)*(y-fxd(6)).^2 + fxd(4)*(y-fxd(6)).^3 +fxd(5)*(y-fxd(6)).^4).^2.*exp(-(y-fxd(6)).^2/fxd(7)^2) ;
+    fun1 = y - > (fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2) 
+    fun2 = y - > abs(y).*(fxr(1) + fxr(2)*(y-fxr(6)) + fxr(3)*(y-fxr(6)).^2 + fxr(4)*(y-fxr(6)).^3 +fxr(5)*(y-fxr(6)).^4).^2.*exp(-(y-fxr(6)).^2/fxr(7)^2) 
+    fun3 = y - > (fxd(1) + fxd(2)*(y-fxd(6)) + fxd(3)*(y-fxd(6)).^2 + fxd(4)*(y-fxd(6)).^3 +fxd(5)*(y-fxd(6)).^4).^2.*exp(-(y-fxd(6)).^2/fxd(7)^2) 
+    fun4 = y - > abs(y).*(fxd(1) + fxd(2)*(y-fxd(6)) + fxd(3)*(y-fxd(6)).^2 + fxd(4)*(y-fxd(6)).^3 +fxd(5)*(y-fxd(6)).^4).^2.*exp(-(y-fxd(6)).^2/fxd(7)^2) 
     
     
-    p_all_r = integral(fun2,-inf,inf);
-    p_all_d = integral(fun4,-inf,inf);
+    p_all_r = integral(fun2,-inf,inf)
+    p_all_d = integral(fun4,-inf,inf)
     
     atol = 1d-7
     
     for i in 1:n
         if(u_r(i) >= l_r(i))    
-            p1r(i) = integral(fun1,-inf,l_r(i)-y_r(i));
-            p2r(i) = integral(fun1,l_r(i)-y_r(i),l_r(i));
-            p5r(i) = integral(fun1,u_r(i),u_r(i)+y_r(i));
-            p6r(i) = integral(fun1,u_r(i)+y_r(i),inf);
-            p3r(i) = max(0,1 - p1r(i) - p2r(i) - p5r(i) - p6r(i));
+            p1r(i) = integral(fun1,-inf,l_r(i)-y_r(i))
+            p2r(i) = integral(fun1,l_r(i)-y_r(i),l_r(i))
+            p5r(i) = integral(fun1,u_r(i),u_r(i)+y_r(i))
+            p6r(i) = integral(fun1,u_r(i)+y_r(i),inf)
+            p3r(i) = max(0,1 - p1r(i) - p2r(i) - p5r(i) - p6r(i))
             
             
-            g1r(i) = integral(fun2,-inf,l_r(i)-y_r(i));
-            g2r(i) = integral(fun2,l_r(i)-y_r(i),l_r(i));
-            g5r(i) = integral(fun2,u_r(i),u_r(i)+y_r(i));
-            g6r(i) = integral(fun2,u_r(i)+y_r(i),inf);
-            g3r(i) = max(0,p_all_r - g1r(i) - g2r(i) - g5r(i) - g6r(i));
+            g1r(i) = integral(fun2,-inf,l_r(i)-y_r(i))
+            g2r(i) = integral(fun2,l_r(i)-y_r(i),l_r(i))
+            g5r(i) = integral(fun2,u_r(i),u_r(i)+y_r(i))
+            g6r(i) = integral(fun2,u_r(i)+y_r(i),inf)
+            g3r(i) = max(0,p_all_r - g1r(i) - g2r(i) - g5r(i) - g6r(i))
             
-            e2r(i) = g2r(i)/max(p2r(i),atol);
-            e5r(i) = g5r(i)/max(p5r(i),atol);
+            e2r(i) = g2r(i)/max(p2r(i),atol)
+            e5r(i) = g5r(i)/max(p5r(i),atol)
         
         end
     
         if(u_d(i) >= l_d(i))
-            p1d(i) = integral(fun3,-inf,l_d(i)-y_d(i));
-            p2d(i) = integral(fun3,l_d(i)-y_d(i),l_d(i));
-            p5d(i) = integral(fun3,u_d(i),u_d(i)+y_d(i));
-            p6d(i) = integral(fun3,u_d(i)+y_d(i),inf);
-            p3d(i) = max(0,1 - p1d(i) - p2d(i) - p5d(i) - p6d(i));
+            p1d(i) = integral(fun3,-inf,l_d(i)-y_d(i))
+            p2d(i) = integral(fun3,l_d(i)-y_d(i),l_d(i))
+            p5d(i) = integral(fun3,u_d(i),u_d(i)+y_d(i))
+            p6d(i) = integral(fun3,u_d(i)+y_d(i),inf)
+            p3d(i) = max(0,1 - p1d(i) - p2d(i) - p5d(i) - p6d(i))
             
-            g1d(i) = integral(fun4,-inf,l_d(i)-y_d(i));
-            g2d(i) = integral(fun4,l_d(i)-y_d(i),l_d(i));
-            g5d(i) = integral(fun4,u_d(i),u_d(i)+y_d(i));
-            g6d(i) = integral(fun4,u_d(i)+y_d(i),inf);
-            g3d(i) = max(0,p_all_d - g1d(i) - g2d(i) - g5d(i) - g6d(i));
+            g1d(i) = integral(fun4,-inf,l_d(i)-y_d(i))
+            g2d(i) = integral(fun4,l_d(i)-y_d(i),l_d(i))
+            g5d(i) = integral(fun4,u_d(i),u_d(i)+y_d(i))
+            g6d(i) = integral(fun4,u_d(i)+y_d(i),inf)
+            g3d(i) = max(0,p_all_d - g1d(i) - g2d(i) - g5d(i) - g6d(i))
             
             e2d(i) = g2d(i)/max(p2d(i),atol)
             e5d(i) = g5d(i)/max(p5d(i),atol)
         end
     
         if (lambda*a_grid(i)-ecost_r+ beta*v_0 - v_d >=0 && u_r(i)>=l_r(i))
-            f1_grid(i) = -e2r(i) + lambda*a_grid(i)-ecost_r+ beta*v_0 - v_d;
-            f2_grid(i) = -e5r(i) + lambda*a_grid(i)-ecost_r+ beta*v_0 - v_d;
+            f1_grid(i) = -e2r(i) + lambda*a_grid(i)-ecost_r+ beta*v_0 - v_d
+            f2_grid(i) = -e5r(i) + lambda*a_grid(i)-ecost_r+ beta*v_0 - v_d
         else  
             f1_grid(i) =  (l_r(i)-0.1)^2
             f2_grid(i) =  (u_r(i)+0.1)^2
         end
     
         if (lambda*a_grid(i)-ecost_d+ beta*v_0 - v_r>=0 && u_d(i)>=l_d(i))
-            f3_grid(i) = -e2d(i) + lambda*a_grid(i)-ecost_d+ beta*v_0 - v_r;
-            f4_grid(i) = -e5d(i) + lambda*a_grid(i)-ecost_d+ beta*v_0 - v_r;
+            f3_grid(i) = -e2d(i) + lambda*a_grid(i)-ecost_d+ beta*v_0 - v_r
+            f4_grid(i) = -e5d(i) + lambda*a_grid(i)-ecost_d+ beta*v_0 - v_r
         else  
-            f3_grid(i) =  (l_d(i)-0.1)^2;
-            f4_grid(i) =  (u_d(i)+0.1)^2;
+            f3_grid(i) =  (l_d(i)-0.1)^2
+            f4_grid(i) =  (u_d(i)+0.1)^2
         end
     end
     
@@ -131,7 +131,7 @@ function myfun_ttl(x)
                         +(p5r(i))*(-abs(u_r(i))+(1+beta)*lambda*a_grid(i)-beta*ecost_r+beta^2*v_0)-beta*g5r(i)...
                         +(p3r(i))*(             (1+beta)*lambda*a_grid(i)-beta*ecost_r+beta^2*v_0)-(1+beta)*g3r(i)...
                         +(p2r(i))*(-abs(l_r(i))+(1+beta)*lambda*a_grid(i)-beta*ecost_r+beta^2*v_0)-beta*g2r(i)...
-                        +(p1r(i))*(lambda*a_grid(i)+beta*v_d)-g1r(i);
+                        +(p1r(i))*(lambda*a_grid(i)+beta*v_d)-g1r(i)
             
         else
             v_r_grid(i) = -p_all_r+lambda*a_grid(i)+beta*v_d
@@ -142,9 +142,9 @@ function myfun_ttl(x)
                         +(p5d(i))*(-abs(u_d(i))+(1+beta)*lambda*a_grid(i)-beta*ecost_d+beta^2*v_0) -beta*g5d(i)...
                         +(p3d(i))*(             (1+beta)*lambda*a_grid(i)-beta*ecost_d+beta^2*v_0)-(1+beta)*g3d(i)...
                         +(p2d(i))*(-abs(l_d(i))+(1+beta)*lambda*a_grid(i)-beta*ecost_d+beta^2*v_0)-beta*g2d(i)...
-                        +(p1d(i))*(lambda*a_grid(i)+beta*v_r)-g1d(i);
+                        +(p1d(i))*(lambda*a_grid(i)+beta*v_r)-g1d(i)
         else
-            v_d_grid(i) = -p_all_d+lambda*a_grid(i)+beta*v_r;
+            v_d_grid(i) = -p_all_d+lambda*a_grid(i)+beta*v_r
         end      
     end
     

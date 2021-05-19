@@ -1,9 +1,10 @@
 module fun_chfc2
+export chfc2
 
 function chfc2(v1, v2, T, m)
     tol = 0.01
     trace = 0
-    t1 = transpose(LinRange(-T,T,m))
+    t1 = collect(LinRange(-T,T,m))
     f1 = ones(m, 1)
     f2 = ones(m, 1)
     f3 = ones(m, 1)

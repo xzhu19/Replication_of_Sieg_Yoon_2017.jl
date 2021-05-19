@@ -1,6 +1,5 @@
 module fun_normal_fit_d
-
-global ted ked mode
+using Replication_of_Sieg_Yoon_2017
 
 function normal_fit_d(x)
     mu   =  0

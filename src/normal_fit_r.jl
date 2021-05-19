@@ -1,6 +1,5 @@
 module fun_normal_fit_r
-
-global ter ker mode
+using Replication_of_Sieg_Yoon_2017
 
 function normal_fit_r(x)
     mu   =  0
