@@ -12,7 +12,7 @@ function snp_fit(x)
     mu = x[6]
     sig = x[7]
     
-    f1  = ((x0 + x1*(t3-mu) + x2*(t3-mu).^2 + x3*(t3-mu).^3 +x4*(t3-mu).^4).^2).*exp(-(t3-mu).^2/sig^2)
+    f1  = (x0 + x1*(t3-mu) + x2*(t3-mu).^2 + x3*(t3-mu).^3 +x4*(t3-mu).^4).^2 .*exp(-(t3-mu).^2/sig^2)
     
     if mode == 1
         f2 = kxr

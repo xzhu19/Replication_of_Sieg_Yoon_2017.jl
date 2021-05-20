@@ -50,11 +50,11 @@ for i in 1:101
 end
 
 figure
-plot(grid,vv(1,:),'Color','k','LineStyle','--','LineWidth',2)
+plot(grid,vv[1, :],'Color','k','LineStyle','--','LineWidth',2)
 hold on
-plot(grid,v(1,:),'Color','r','LineStyle','-.','LineWidth',2)
+plot(grid,v[1, :],'Color','r','LineStyle','-.','LineWidth',2)
 hold on
-plot(grid,v(2,:),'Color','b','LineStyle','-','LineWidth',2)
+plot(grid,v(2,:],'Color','b','LineStyle','-','LineWidth',2)
 hleg = legend('$V^D(\theta)$','$V^{I,R}(\theta,-0.4,0)$','$V^{I,R}(\theta,-0.05,0)$')
 set(hleg, 'Box','off','Location','NorthEast','Interpreter','latex')
 ylabel('value function')
@@ -73,9 +73,9 @@ end
 
 
 figure
-plot(grid,vv(1,:),'Color','b','LineStyle','-','LineWidth',2)
+plot(grid,vv[1, :],'Color','b','LineStyle','-','LineWidth',2)
 hold on
-plot(grid,w(1,:),'Color','r','LineStyle','--','LineWidth',2)
+plot(grid,w[1, :],'Color','r','LineStyle','--','LineWidth',2)
 hleg = legend('$V^D(\theta)$','$V^{I,R}(\theta,\bar{s}_R(a),a)$')
 set(hleg, 'Box','off','Location','NorthEast','Interpreter','latex')
 ylabel('value function')
@@ -83,15 +83,15 @@ xlabel('ideological location (\theta)')
 axis([-1.5 1.5 -9 -3])
 
 figure
-plot(grid,vv(1,:),'Color','b','LineStyle','-','LineWidth',2)
+plot(grid,vv[1, :],'Color','b','LineStyle','-','LineWidth',2)
 hold on
-plot(grid,w(2,:),'Color','r','LineStyle','--','LineWidth',2)
+plot(grid,w(2,:],'Color','r','LineStyle','--','LineWidth',2)
 hleg = legend('$V^D(\theta)$','$V^{I,R}(\theta,\underline{s}_R(a),a)$')
 set(hleg, 'Box','off','Location','NorthEast','Interpreter','latex')
 ylabel('value function')
 xlabel('ideological location (\theta)')
 axis([-1.5 1.5 -9 -3])
 
-vv0=p_d*vv(1,:) + (1-p_d)*vv(2,:)
+vv0=p_d*vv[1, :] + (1-p_d)*vv(2,:]
 
 end

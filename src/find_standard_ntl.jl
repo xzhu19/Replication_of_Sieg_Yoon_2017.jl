@@ -1,6 +1,7 @@
 module code_find_standard_ntl
-include("./Replication_of_Sieg_Yoon_2017.jl")
-using .Replication_of_Sieg_Yoon_2017
+include("./src/Replication_of_Sieg_Yoon_2017.jl")
+include("./src/myfun_ntl2.jl")
+using .Replication_of_Sieg_Yoon_2017, .fun_myfun_ntl2
 
 # Solving for election standards and valufuction of median voter in no term limit case
 # Define matrix

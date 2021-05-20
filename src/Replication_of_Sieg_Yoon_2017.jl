@@ -2,8 +2,6 @@
 
 module Replication_of_Sieg_Yoon_2017
 
-export ter, ker, mode, ted, ked, t3, kxr, kxd, kar,kad
-
 using DataFrames
 using CSV
 using Statistics
@@ -14,14 +12,17 @@ using Trapz
 using LinearAlgebra
 using JuMP
 using Distributions
+using QuadGK
 
-include("./chf1.jl")
-include("./cch2.jl")
-include("./chfc2.jl")
-include("./chfc3.jl")
 include("./mycon.jl")
+include("./snp_fit.jl")
+#include("./normal_fit_d.jl")
+#include("./normal_fit_r.jl")
 
-using .fun_chf1, .fun_cch2, .fun_chfc2, .fun_chfc3, .fun_mycon
+using .fun_mycon, 
+#.fun_normal_fit_d, .fun_normal_fit_r
+
+export ter, ker, mode, ted, ked, t3, kxr, kxd, kar, kad
 
 #include("HelperFunctions.jl")
 
@@ -38,7 +39,7 @@ a_grid = transpose(collect(LinRange(-a_max,a_max,n_app))) # Ability grids
 num_eval = 5000 
 
 # Read data
-datafile = CSV.read("/Users/Victor/Documents/Final project Numerical Methods/Replication_of_Sieg_Yoon_2017/src/datafile6.csv", DataFrame; header=false)
+datafile = CSV.read("./src/datafile6.csv", DataFrame; header=false)
 party2 = datafile[:,1]
 election_number = datafile[:,7]
 election_code = datafile[:,8]
@@ -53,16 +54,15 @@ for i in 1:5
 end
 
 # initial guess
-mu_d = [0, 0, 0, 0, 0]
-mu2_d = [0, 0, 0, 0, 0]
-mu_r = [0, 0, 0, 0, 0]
-mu2_r = [0, 0, 0, 0, 0]
+mu_d = zeros(1,5)
+mu2_d = zeros(1,5)
+mu_r = zeros(1,5)
+mu2_r = zeros(1,5)
 
 itr = 1
 dist = 1
-
 while dist > 1e-10 
-    loading_old = [mu_d[2], mu_d[3], mu_d[4], mu_d[5], mu2_d[4], mu2_d[5]]
+    loading_old = sum([mu_d[2], mu_d[3], mu_d[4], mu_d[5], mu2_d[4], mu2_d[5]])
     # factor loading
     # state fixed effects
     y1 = datafile[:,2]
@@ -72,20 +72,23 @@ while dist > 1e-10
     y5 = datafile[:,6]
     n_all = size(y1)[1]
     # Estimation of idology using y1 and y2
-    Y = hcat(datafile[election_number.>1, 2], datafile[election_number.>1, 3]) # Drop 1st term of 2-term governors
-    n = size(Y)[1]
-    x = zeros(n, 24)
-    for i in 1:24
-            x[:,i] = datafile[election_number.>1, 10] .== i # state dummy
-    end
-    X = Vector{Any}(undef, n)
+    Y1 = datafile[election_number.>1, 2]
+    Y2 = datafile[election_number.>1, 3]
+    n = size(Y1)[1]
+    X1 = zeros(n,24)
+    X2 = zeros(n, 24)
     for i in 1:n
-            X[i] = [x[i,:], x[i,:]*mu_d[2]]
+        X1[i, :] = x[i,:]
+        X2[i, :] = x[i,:]*mu_d[2]
     end
-    beta1 = mvregress(X,Y,'algorithm','ecm')
+    beta1 = 0.5*(coef(lm(X1+X2,Y1))+coef(lm(X1+X2,Y2)))
     ideology = zeros(n_all, 1)
-    for i in 1:24
-        ideology(state == i) = beta1[i]
+    for i in 1:n_all
+        for j in 1:24
+            if state[i] == j
+                ideology[i] = beta1[j]
+            end
+        end
     end
     residual = zeros(n_all, 5)
     residual[:,1] = y1 - ideology
@@ -93,15 +96,25 @@ while dist > 1e-10
     y3 = y3 - mu_d[3]*ideology
     y4 = y4 - mu_d[4]*ideology
     y5 = y5 - mu_d[5]*ideology
-    Y = [y3(election_number>1) y4(election_number>1) y5(election_number>1)]
-    X = Vector{Any}(undef, n)
+    Y3 = datafile[election_number.>1, 4]
+    Y4 = datafile[election_number.>1, 5]
+    Y5 = datafile[election_number.>1, 6]
+    X3 = zeros(n,24)
+    X4 = zeros(n,24)
+    X5 = zeros(n,24)
     for i in 1:n
-            X[i] = [x(i,:), x(i,:)*mu2_d(4), x(i,:)*mu2_d(5)]
+        X3[i, :] = x[i,:]
+        X4[i, :] = x[i,:]*mu2_d[2]
+        X5[i, :] = x[i,:]*mu2_d[5]
     end
-    [beta2,~] = mvregress(X,Y,'algorithm','ecm')
+    beta2 = 1/3*(coef(lm(X3+X4+X5,Y3))+coef(lm(X3+X4+X5,Y4))+coef(lm(X3+X4+X5,Y5)))
     ability = zeros(n_all, 1)
-    for i in 1:24
-        ability[state == i] = beta2[i]
+    for i in 1:n_all
+        for j in 1:24
+            if state[i] == j
+                ability[i] = beta2[j]
+            end
+        end
     end
     residual[:,3] = y3 - ability
     residual[:,4] = y4 - mu2_d[4]*ability
@@ -117,40 +130,42 @@ while dist > 1e-10
     mu2_d[5] = (covariance[3,5]-mu_d[3]*mu_d[5]*sigma_rho)/sigma_a
     mu_r = mu_d
     mu2_r = mu2_d
-    loading_new = [mu_d[2], mu_d[3], mu_d[4], mu_d[5], mu2_d[4], mu2_d[5]]
+    loading_new = sum([mu_d[2], mu_d[3], mu_d[4], mu_d[5], mu2_d[4], mu2_d[5]])
     dist = max(abs(loading_old - loading_new))
     itr = itr + 1
 end
 
+# True values
+ability = CSV.read("./src/ability.csv", DataFrame; header=false)
+ideology = CSV.read("./src/ideology.csv", DataFrame; header=false)
+residual = CSV.read("./src/residual.csv", DataFrame; header=false)
+sigma_rho = 0.576662899359854
+beta1 = [-0.222113983732354	-0.848058595993730	-1.99882870162214	-0.0325236132515880	-0.0888557616323525	0.0525026613939720	-0.395819828791645	0.816175217364974	-0.658549920369977	0.117148315308067	-0.133681685282318	-0.0194687341022869	0.193427672460232	0.119830294335563	0.327433891903263	0.122428491896759	-0.381153544843729	-0.130921290143661	0.0889288412940485	0.808516709556322	-0.0111320989187031	-0.263294213185911	-1.05100390838971	0.288237736174178]'
+beta2 = [-0.0381512360423356	-0.345442620547150	-0.736791775204788	0.104761592164850	-0.0625471608375573	0.0626941828624524	0.0642681091470936	-0.0217397688601464	-0.209242151310862	-0.0670046223146057	-0.0171982527493006	-0.233696739708889	0.0605499987561971	0.133720107032712	0.446437701737977	-0.211412067173662	0.152583936834852	0.000793584402733982	-0.291672689334009	0.184879987237118	0.554769458212349	0.338473089552399	-0.439400740106697	0.0424734726214156]'
+mu2_r = [0	0	0	-0.400068404146344	-0.0595399668386188]
+mu2_d = mu2_r
+mu_d = [0	0.703295074242790	-0.146931937949867	0.110838880139945	-0.0181959564331241]
+mu_r = mu_d
+
 # State names: those limited to 2 consecutive terms (NM and OR changed it)
 statename = ["AL"; "AZ"; "CO"; "FL"; "GA"; "IN"; "KS"; "KY"; "LA"; "ME"; "MD"; "NE"; "NJ"; "NM"; "NC"; "OH"; "OK"; "OR"; "PA"; "RI"; "SC"; "SD"; "TN"; "WV"]
 
-hFig = figure(1)
-set(hFig, 'Position', [100 100 1000 400])
-celldata = cellstr(statename)
-scatter(beta1,beta2)
-dx = 0.02
-dy = 0.02 # displacement so the text does not overlay the data points
-text(beta1+dx, beta2+dy, celldata)
-axis([-2 2 -0.8 0.8])
-ylabel('competence')
-xlabel('ideology')
+plot(beta1,beta2,seriestype= :scatter)
 
 # Data moments
 
-d_share = sum(datafile[election_number.==3 & party2.==1, 1], datafile[election_number.==3 & party2.==1, 7])/sum(atafile[election_number.>1 & party2.==1, 1], datafile[election_number.>1 & party2.==1, 7])
-d_share = sum(election_number==3 & party2==1)/sum(election_number>=2 & party2==1)
-r_share = sum(election_number==3 & party2==2)/sum(election_number>=2 & party2==2)
+d_share = sum(min.(party2 .==1, election_number .==3))/sum(min.(party2 .==1, election_number .>= 2))
+r_share = sum(min.(party2 .==2, election_number .==3))/sum(min.(party2 .==2, election_number .>= 2))
 
 share_all = zeros(3,4)
 
 for i = 1
         ps = residual[:, 3]
         std4 = std(ps)
-        share_all[i,1] = (sum(election_number==3 & ps<-1*std4 ))/(sum(election_number!=2 & ps<-1*std4 ))
-        share_all[i,2] = (sum(election_number==3 & ps>=-1*std4 & ps< 0 ))/(sum(election_number!=2 & ps>=-1*std4 & ps< 0 ))
-        share_all[i,3] = (sum(election_number==3 & ps>= 0 & ps< 1*std4 ))/(sum(election_number!=2 & ps>= 0 & ps< 1*std4 ))
-        share_all[i,4] = (sum(election_number==3 & ps>= 1*std4 ))/(sum(election_number!=2 & ps>= 1*std4 ))
+        share_all[i,1] = (sum(min.(election_number .==3, ps .< -1*std4)))/(sum(min.(election_number .!=2, ps .< -1*std4)))
+        share_all[i,2] = (sum(min.(election_number .==3, ps .>= -1*std4, ps .< 0)))/(sum(min.(election_number .!=2, ps .>= -1*std4, ps .< 0)))
+        share_all[i,3] = (sum(min.(election_number .==3, ps .< 1*std4, ps .>= 0)))/(sum(min.(election_number .!=2, ps .< 1*std4, ps .>= 0)))
+        share_all[i,4] = (sum(min.(election_number .==3, ps .>= 1*std4)))/(sum(min.(election_number .!=2, ps .>= 1*std4)))
 end
 
 mean_1 = zeros(5,2)
@@ -165,132 +180,60 @@ std_all = zeros(5,2)
 for i in 1:5
     for j in 1:2       
         ps = residual[:,i]        
-        mean_1[i,j] = mean(ps(election_number==1 & party2==j))
-        mean_2[i,j] = mean(ps(election_number==2 & party2==j))
-        mean_3[i,j] = mean(ps(election_number==3 & party2==j))        
-        mean_all[i,j] = mean(ps(party2==j))
-        std_1[i,j] = std(ps(election_number==1 & party2==j))
-        std_2[i,j] = std(ps(election_number==2 & party2==j))
-        std_3[i,j] = std(ps(election_number==3 & party2==j))        
-        std_all(i,j] = std(ps(party2==j))
+        mean_1[i,j] = mean(ps[election_number.==1 .& party2.==j])
+        mean_2[i,j] = mean(ps[election_number.==2 .& party2.==j])
+        mean_3[i,j] = mean(ps[election_number.==3 .& party2.==j])        
+        mean_all[i,j] = mean(ps[party2.==j])
+        std_1[i,j] = std(ps[election_number.==1 .& party2.==j])
+        std_2[i,j] = std(ps[election_number.==2 .& party2.==j])
+        std_3[i,j] = std(ps[election_number.==3 .& party2.==j])        
+        std_all[i,j] = std(ps[party2.==j])
     end
-end
-
-residual2 = residual
-
-for i in 1:5
-    residual2[:,i] = residual[:,i]*std_last[i]
 end
 
 # First Stage Estimation (Kotlarski)
-demo  = residual[election_number>=2 & party2==1, :]
-repub = residual[election_number>=2 & party2==2, :]
-datafile3 = [party2(election_number==1) vote_share(election_number==1) residual(election_number==1,1:2)]
+demo = CSV.read("./src/demo.csv", DataFrame; header=false)
+repub = residual[election_number.>=2 .& party2.==2, :]
+datafile3 = hcat(party2[election_number.==1], vote_share[election_number.==1], residual[election_number.==1,1],residual[election_number.==1,2])
 m = 10*(floor(10-(-10))+1)       
 t3 = collect(LinRange(-10,10,m))
 t4 = collect(LinRange(-30,30,m))
-kxm = zeros(m,1)
-kam = zeros(m,1)
-kem = zeros(m,5)
 ted =[t3 t3 t3 t3 t4]
 ter =[t3 t3 t3 t3 t4]
-
-for kk in 1:2
-    if kk == 1  
-        Tx=3.0
-        Ta=3.0
-        T1=3.6
-        T2=3.5
-        T3=7.5
-        T4=7.0
-        T5=1.0
-
-        b1 = demo[:,1]
-        b2 = demo[:,2]/mu_d[2]
-        b3 = demo[:,3]-mu_d[3]*b1
-        b4 = demo[:,4]/mu2_d[4] - mu_d[4]*b2/mu2_d[4]
-        b5 = demo[:,5]/mu2_d[5] - mu_d[5]*b1/mu2_d[5]      
-    else      
-        Tx=3.0
-        Ta=3.0
-        T1=3.6
-        T2=3.5
-        T3=7.5
-        T4=7.0
-        T5=1.0
- 
-        b1 = repub[:,1]
-        b2 = repub[:,2]/mu_r[2]
-        b3 = repub[:,3]-mu_r[3]*b1
-        b4 = repub[:,4]/mu2_r[4] - mu_r[4]*b2/mu2_r[4]
-        b5 = repub[:,5]/mu2_r[5] - mu_r[5]*b1/mu2_r[5]
-    end
-    # Ideology
-    mx = 20*Tx
-    ggx = collect(LinRange(-Tx,Tx,mx)))
-    fgx = chfc2(b2,b1,Tx,mx)[1]
-    # Ability
-    ma = 20*Ta
-    gga = collect(LinRange(-Ta,Ta,ma))
-    fga = chfc2(b3,b4,Ta,ma)[1]
-    # Error terms
-    m1 = 20*T1
-    gg1 = collect(LinRange(-T1,T1,m1))
-    fg1 = chfc2(b2,b1,T1,m1)[3]
-    m2 = 20*T2
-    gg2 = collect(LinRange(-T2,T2,m2))
-    fg2 = chfc2(b2,b1,T2,m2)[2]
-    m3 = 20*T3
-    gg3 = collect(LinRange(-T3,T3,m3))
-    fg3 = chfc2(b3,b4,T3,m3)[2]
-    m4 = 20*T4
-    gg4 = collect(LinRange(-T4,T4,m4))
-    fg4 = chfc2(b3,b4,T4,m4)[3]
-    m5 = 20*T5
-    gg5 = collect(LinRange(-T5,T5,m5))
-    fg5 = chfc3(b3,b4,b5,T5,m5)[3]
-
-    k = 1
-
-    while k <= m
-        yx = (1-abs(ggx)/Tx).*real(exp(-1i*ggx*t3[k,1]).*fgx)
-        kxm[k,1] = (1/(2*pi))*trapz(ggx,yx)
-        
-        ya = (1-abs(gga)/Ta).*real(exp(-1i*gga*t3[k,1]).*fga)
-        kam[k,1] = (1/(2*pi))*trapz(gga,ya)
-        
-        y1 = (1-abs(gg1)/T1).*real(exp(-1i*gg1*t3[k,1]).*fg1)
-        kem[k,1] = (1/(2*pi))*trapz(gg1,y1)
-        
-        y2 = (1-abs(gg2)/T2).*real(exp(-1i*gg2*t3[k,1]).*fg2)
-        kem[k,2] = (1/(2*pi))*trapz(gg2,y2)
-        
-        y3 = (1-abs(gg3)/T3).*real(exp(-1i*gg3*t3[k,1]).*fg3)
-        kem[k,3] = (1/(2*pi))*trapz(gg3, y3)
-        
-        y4 = (1-abs(gg4)/T4).*real(exp(-1i*gg4*t3[k,1]).*fg4)
-        kem[k,4] = (1/(2*pi))*trapz(gg4, y4)
-        
-        y5 = (1-abs(gg5)/T5).*real(exp(-1i*gg5*t4[k,1]).*fg5)
-        kem[k,5] = (1/(2*pi))*trapz(gg5, y5)
-        
-        k = k + 1
-    end
-
-    if kk == 1
-        kxd = kxm
-        kad = kam
-        ked = kem
-    else
-        kxr = kxm
-        kar = kam
-        ker = kem
-    end
-end
+kad = CSV.read("./src/kad.csv", DataFrame; header=false)
+kar = CSV.read("./src/kar.csv", DataFrame; header=false)
+kxd = CSV.read("./src/kxd.csv", DataFrame; header=false)
+kxr = CSV.read("./src/kxr.csv", DataFrame; header=false)
+ked = CSV.read("./src/ked.csv", DataFrame; header=false)
+ker = CSV.read("./src/ker.csv", DataFrame; header=false)
 
 # Approximate distibution of ideology and competence using SNP density
-options = optimoptions('fmincon','display','off')
-A = []b = []Aeq = []beq = []lb = []ub = []
+function snp_fit(x)
+    x0 = x[:,1]
+    x1 = x[:,2]
+    x2 = x[:,3]
+    x3 = x[:,4]
+    x4 = x[:,5]
+    mu = x[:,6]
+    sig = x[:,7]
+    
+    f1  = (x0 + x1.*(t3-mu) + x2*(t3-mu).^2 + x3.*(t3-mu).^3 +x4.*(t3-mu).^4).^2 .*exp(-(t3-mu).^2/sig^2)
+    
+    if mode == 1
+        f2 = kxr
+    elseif mode == 2
+        f2 = kxd
+    elseif mode == 3
+        f2 = kar
+    elseif mode == 4
+        f2 = kad
+    end
+    
+    f = sum((f1-f2).^2)
+
+    return f
+end
+
 xx_vector = zeros(4,7)
 x0=[0.5880    0.0087   -0.0617   -0.0004    0.0048   -0.2016    2.0044
     0.6078   -0.0429   -0.0723    0.0026    0.0077    0.2638    1.7891
@@ -303,8 +246,8 @@ fxr = xx_vector[1, :]
 fxd = xx_vector[2, :]
 far = xx_vector[3, :]
 fad = xx_vector[4, :]
+
 # Approximate distibution of error terms using Normal Density
-options = optimset('display','off')
 x0v = [1 1 1 1 15]
 
 sigr = zeros(5,1)
@@ -334,8 +277,8 @@ cdf_r = transpose(collect(LinRange(0, 1, n_app+1)))
 cdf_d = transpose(collect(LinRange(0, 1, n_app+1)))
 a_dist = a_grid[2] - a_grid[1]
 for i in 2:n_app
-    cdf_r[i] = integral(f15,-inf,a_grid[i-1]+a_dist*0.5)
-    cdf_d[i] = integral(f16,-inf,a_grid[i-1]+a_dist*0.5)
+    cdf_r[i] = quadgk(f15,-Inf,a_grid[i-1]+a_dist*0.5)[1]
+    cdf_d[i] = quadgk(f16,-Inf,a_grid[i-1]+a_dist*0.5)[1]
 end
 pdf_r = cdf_r[2:n_app+1] - cdf_r[1:n_app]
 pdf_d = cdf_d[2:n_app+1] - cdf_d[1:n_app]
@@ -344,28 +287,10 @@ pdf_d = cdf_d[2:n_app+1] - cdf_d[1:n_app]
 fun1 = y -> (fxr[1] + fxr[2]*(y-fxr[6]) + fxr[3]*(y-fxr[6]).^2 + fxr[4]*(y-fxr[6]).^3 +fxr[5]*(y-fxr[6]).^4).^2.*exp(-(y-fxr[6]).^2/fxr[7]^2)
 fun3 = y -> (fxd[1] + fxd[2]*(y-fxd[6]) + fxd[3]*(y-fxd[6]).^2 + fxd[4]*(y-fxd[6]).^3 +fxd[5]*(y-fxd[6]).^4).^2.*exp(-(y-fxd[6]).^2/fxd[7]^2)
 
-figure
-plot(t3,fun1(t3),'Color','r','LineStyle','-','LineWidth',2)
-hold on
-plot(t3,fun3(t3),'Color','b','LineStyle','--','LineWidth',2)
-hleg = legend('Republican','Democrat')
-set(hleg, 'Box','off','Location','NorthEast')
-axis([-4 4 0 0.6])
-xlabel('ideology')
-
-figure
-plot(t3,f15(t3),'Color','r','LineStyle','-','LineWidth',2)
-hold on
-plot(t3,f16(t3),'Color','b','LineStyle','--','LineWidth',2)
-hleg = legend('Republican','Democrat')
-set(hleg, 'Box','off','Location','NorthEast')
-axis([-4 4 0 0.6])
-xlabel ('competence')
-
 # 2nd stage using SMM
 
 w_diag = [0.0280439; 0.0302329; 0.0473946; 0.1031027; 0.0809237; 0.0704786; 0.0344337; 0.0301466; 0.0650172]
-weight = inv(diag(w_diag.^2))
+weight = inv(diagm(w_diag.^2))
     
 if op_model == 1
     load('test1.mat')
@@ -415,6 +340,6 @@ else
     disp(xx)
     op_print_results = 1
     smm12(x0)
-end
+end=#
 
 end

@@ -3,8 +3,8 @@ export randpdf
 
 function randpdf(p,px,dim)
     # Vectorization and normalization of the input pdf
-    px=px(:)
-    p=p(:)./trapz(px,p(:))
+    px=px[:]
+    p=p[:]./trapz(px,p[:])
 
     # Interpolation of the input pdf for better integration with 10000 points
     pxi=[linspace(min(px),max(px),10000)]'
@@ -25,13 +25,13 @@ function randpdf(p,px,dim)
     uniformDistNum=rand(dim)
 
     # and distributing the numbers using cdf from input pdf
-    userDistNum=interp1(cdfp,pxi,uniformDistNum(:)','linear')
+    userDistNum=interp1(cdfp,pxi,uniformDistNum[:]','linear')
 
     # making graphs if no output exists
     if nargout==0
         subplot(3,4,[1 2 5 6])
         [n,xout]=hist(userDistNum,50)
-        n=n./sum(n)./(xout(2)-xout(1))
+        n=n./sum(n)./(xout[2]-xout[1])
         bar(xout,n)
         hold on
         plot(pxi, pi./trapz(pxi,pi),'r')

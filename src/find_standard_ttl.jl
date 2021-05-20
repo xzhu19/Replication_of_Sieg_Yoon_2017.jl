@@ -1,6 +1,7 @@
 module code_find_standard_ttl
-include("./Replication_of_Sieg_Yoon_2017.jl")
-using .Replication_of_Sieg_Yoon_2017
+include("./src/Replication_of_Sieg_Yoon_2017.jl")
+include("./src/find_standard_ttl.jl")
+using .Replication_of_Sieg_Yoon_2017, .fun_myfun_ttl
 
 # Solving for election standards and valufuction of median voter in 2-term limit case
 # Estimated densities

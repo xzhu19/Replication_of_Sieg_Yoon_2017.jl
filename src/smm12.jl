@@ -1,7 +1,9 @@
 module fun_smm12
-include("./Replication_of_Sieg_Yoon_2017.jl")
+include("./src/Replication_of_Sieg_Yoon_2017.jl")
 using .Replication_of_Sieg_Yoon_2017
 export smm12
+
+using QuadGK
 
 function smm12(x)
     # Global variables
@@ -24,26 +26,26 @@ function smm12(x)
     global d_share r_share share_all op_model
     # Read Parameters
     if op_model == 1
-        lambda   = x(3)
+        lambda   = x[3]
         ecost_d  = 0.0
         ecost_r  = 0.0
         sigma_pd = x[4]
-        y_d      = (x(1) + lambda*a_grid) # beta*y_d
-        y_r      = (x(2) + lambda*a_grid) # beta*y_r
+        y_d      = (x[1] + lambda*a_grid) # beta*y_d
+        y_r      = (x[2] + lambda*a_grid) # beta*y_r
     elseif op_model == 2 
         lambda   = 0
         ecost_d  = 0
         ecost_r  = 0
         sigma_pd = x[3]
-        y_d      = (x(1) + lambda*a_grid) # beta*y_d
-        y_r      = (x(2) + lambda*a_grid) # beta*y_r
+        y_d      = (x[1] + lambda*a_grid) # beta*y_d
+        y_r      = (x[2] + lambda*a_grid) # beta*y_r
     elseif op_model == 3 
         lambda   = x[3]
         ecost_d  = x[4]
         ecost_r  = x[5]
         sigma_pd = x[6]
-        y_d      = (x(1) + lambda*a_grid) # beta*y_d
-        y_r      = (x(2) + lambda*a_grid) # beta*y_r
+        y_d      = (x[1] + lambda*a_grid) # beta*y_d
+        y_r      = (x[2] + lambda*a_grid) # beta*y_r
     end
     # Set Random Number Seed
     rng(100)
@@ -100,15 +102,15 @@ function smm12(x)
     ct3 = 1
     ct4 = 1
 
-    incumbent(1,:) = 0
-    party(1,:) = 1
+    incumbent[1, :] = 0
+    party[1, :] = 1
     
     # Start generate model from period 1 to num_sim
     for i in 1:num_sim
         if incumbent[i, 1] == 0
            if party[i, :] == 1
-               rho[i] = rho_d(ct1)
-               a[i] = a_d(ct1)
+               rho[i] = rho_d[ct1)
+               a[i] = a_d[ct1)
                ct1 = ct1+1  
                if (l_d(a[i])>u_d(a[i])) || (rho[i]<l_d(a[i])-y_d(a[i])) || (rho[i]>u_d(a[i])+y_d(a[i]))
                    x[i] = rho[i]
@@ -124,9 +126,9 @@ function smm12(x)
                    x[i] = rho[i]
                    incumbent[i+1, :] = 1
                end     
-           elseif party(i,1) == 2
-               rho[i] = rho_r(ct2)
-               a[i] = a_r(ct2)
+           elseif party[i, 1] == 2
+               rho[i] = rho_r[ct2]
+               a[i] = a_r[ct2]
                ct2 = ct2 + 1        
                if (l_r(a[i])>u_r(a[i])) || (rho[i]<l_r(a[i])-y_r(a[i])) || (rho[i]>u_r(a[i])+y_r(a[i])) # extremist
                    x[i] = rho[i]
@@ -149,21 +151,21 @@ function smm12(x)
             party[i,:] = party[i-1,:]
             x[i] = rho[i]
             incumbent[i+1,:] = 0
-            party[i+1,:] = randi(2)
+            party[i+1,:] = randi[2]
         end  
         if party[i, 1] == 1
-            p1[i,:] = x[i]         + p1_d(ct3,:)
-            p2[i,:] = mu_d(2)*x[i] + p2_d(ct3,:)
-            p3[i,:] = mu_d(3)*x[i] + a_grid(a[i])           + p3_d(ct3,:)
-            p4[i,:] = mu_d(4)*x[i] + mu2_d(4)*a_grid(a[i])  + p4_d(ct3,:)
-            p5[i,:] = mu_d(5)*x[i] + mu2_d(5)*a_grid(a[i])  + p5_d(ct3,:)
+            p1[i,:] = x[i]         + p1_d[ct3,:]
+            p2[i,:] = mu_d[2]*x[i] + p2_d[ct3,:]
+            p3[i,:] = mu_d[3]*x[i] + a_grid(a[i])           + p3_d[ct3,:]
+            p4[i,:] = mu_d[4]*x[i] + mu2_d[4]*a_grid(a[i])  + p4_d[ct3,:]
+            p5[i,:] = mu_d[5]*x[i] + mu2_d[5]*a_grid(a[i])  + p5_d[ct3,:]
             ct3 = ct3+1
-        elseif party(i,1) == 2
-            p1[i,:] = x[i]         + p1_r(ct4,:)
-            p2[i,:] = mu_r(2)*x[i] + p2_r(ct4,:)
-            p3[i,:] = mu_r(3)*x[i] + a_grid(a[i])           + p3_r(ct4,:)
-            p4[i,:] = mu_r(4)*x[i] + mu2_r(4)*a_grid(a[i])  + p4_r(ct4,:)
-            p5[i,:] = mu_r(5)*x[i] + mu2_r(5)*a_grid(a[i])  + p5_r(ct4,:)       
+        elseif party[i, 1] == 2
+            p1[i,:] = x[i]         + p1_r[ct4,:]
+            p2[i,:] = mu_r[2]*x[i] + p2_r[ct4,:]
+            p3[i,:] = mu_r[3]*x[i] + a_grid(a[i])           + p3_r[ct4,:]
+            p4[i,:] = mu_r[4]*x[i] + mu2_r[4]*a_grid(a[i])  + p4_r[ct4,:]
+            p5[i,:] = mu_r[5]*x[i] + mu2_r[5]*a_grid(a[i])  + p5_r[ct4,:]       
             ct4 = ct4+1
         end     
     end
@@ -180,8 +182,8 @@ function smm12(x)
     p4v = reshape(p4,[4*num_sim,1])
     p5v = reshape(p5,[4*num_sim,1])
     
-    partyv = reshape(party(1:num_sim,:),[4*num_sim,1])
-    election_number1 = 1*(incumbent(1:num_sim,:)==0 & incumbent(2:num_sim+1,:)==1 ) + 2*(incumbent(1:num_sim,:)==1 )+3*(incumbent(1:num_sim,:)==0 & incumbent(2:num_sim+1,:)==0)
+    partyv = reshape(party[1:num_sim,:],[4*num_sim,1])
+    election_number1 = 1*(incumbent[1:num_sim,:]==0 & incumbent[2:num_sim+1,:]==1 ) + 2*(incumbent[1:num_sim,:]==1 )+3*(incumbent[1:num_sim,:]==0 & incumbent[2:num_sim+1,:]==0)
     election_number = reshape(election_number1,[4*num_sim,1])
     
     datav = [p1v p2v p3v p4v p5v]
@@ -189,10 +191,10 @@ function smm12(x)
     for i in 1:5
         ps = datav[:,i]
         for j in 1:2
-            std_1_sim(i,j) = std(ps(partyv(1:num_sim*4)==j   & election_number==1 ))        
-            mean_2_sim(i,j) = mean(ps(partyv(1:num_sim*4)==j & election_number==2 ))
-            std_2_sim(i,j) = std(ps(partyv(1:num_sim*4)==j   & election_number==2 ))       
-            mean_all_sim(i,j) = mean(ps(partyv(1:num_sim*4)==j  ))
+            std_1_sim[i,j] = std(ps(partyv[1:num_sim*4]==j   & election_number==1 ))        
+            mean_2_sim[i,j] = mean(ps(partyv[1:num_sim*4]==j & election_number==2 ))
+            std_2_sim[i,j] = std(ps(partyv[1:num_sim*4]==j   & election_number==2 ))       
+            mean_all_sim[i,j] = mean(ps(partyv[1:num_sim*4]==j  ))
         end
     end
     
@@ -235,11 +237,11 @@ function smm12(x)
     
     # Moments to identify the benefit of holding office
     ct = 3
-    g(ct+1,1) = std_1(1,1)/std_2(1,1)
-    g(ct+2,1) = std_1(1,2)/std_2(1,2)
+    g[ct+1,1] = std_1[1,1]/std_2[1,1]
+    g[ct+2,1] = std_1[1,2]/std_2[1,2]
     
-    g(ct+1,2) = std_1_sim(1,1)/std_2_sim(1,1)
-    g(ct+2,2) = std_1_sim(1,2)/std_2_sim(1,2)
+    g[ct+1,2] = std_1_sim[1,1]/std_2_sim[1,1]
+    g[ct+2,2] = std_1_sim[1,2]/std_2_sim[1,2]
     
     # Identification of lambda, mu25, mu26
     
@@ -256,7 +258,7 @@ function smm12(x)
     end
     
     
-    g_diff = (g(:,1) - g(:,2))
+    g_diff = (g[:,1] - g[:,2])
     f = g_diff'*weight*g_diff
 
     #Print results
@@ -277,10 +279,10 @@ function smm12(x)
     
     
     for i in 1:n_app
-        pr1_r[i] = integral(fun1,l_r[i],u_r[i])
-        pr1_d[i] = integral(fun3,l_d[i],u_d[i])
-        pr2_r[i] = integral(fun1,l_r[i]-y_r[i],u_r[i]+y_r[i])-pr1_r[i]
-        pr2_d[i] = integral(fun3,l_d[i]-y_d[i],u_d[i]+y_d[i])-pr1_d[i]
+        pr1_r[i] = quadgk(fun1,l_r[i],u_r[i])[1]
+        pr1_d[i] = quadgk(fun3,l_d[i],u_d[i])[1]
+        pr2_r[i] = quadgk(fun1,l_r[i]-y_r[i],u_r[i]+y_r[i])-pr1_r[i][1]
+        pr2_d[i] = quadgk(fun3,l_d[i]-y_d[i],u_d[i]+y_d[i])-pr1_d[i][1]
     end
         
     disp('centrist D and R')
@@ -319,11 +321,11 @@ function smm12(x)
     ylabel('ideology')
     axis([-1.0 1.0 -2 2])
     
-    p1_v = p1(:)*std_last[1]
-    p2_v = p2(:)*std_last[2]
-    p3_v = p3(:)*std_last[3]*100
-    p4_v = p4(:)*std_last[4]*100
-    p5_v = p5(:)*std_last[5]
+    p1_v = p1[:]*std_last[1]
+    p2_v = p2[:]*std_last[2]
+    p3_v = p3[:]*std_last[3]*100
+    p4_v = p4[:]*std_last[4]*100
+    p5_v = p5[:]*std_last[5]
     a_v = a_grid(a)
     x_v = x
     disp('with term limit')

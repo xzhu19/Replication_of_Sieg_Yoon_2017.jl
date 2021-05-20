@@ -1,7 +1,9 @@
 module fun_myfun_ttl
-include("./Replication_of_Sieg_Yoon_2017.jl")
+include("./src/Replication_of_Sieg_Yoon_2017.jl")
 using .Replication_of_Sieg_Yoon_2017
 export myfun_ttl
+
+using QuadGK
 
 function myfun_ttl(x)
     # Calculate the system of equations in 2-term limit case
@@ -69,23 +71,23 @@ function myfun_ttl(x)
     fun4 = y - > abs(y).*(fxd[1] + fxd[2]*(y-fxd[6]) + fxd[3]*(y-fxd[6]).^2 + fxd[4]*(y-fxd[6]).^3 +fxd[5]*(y-fxd[6]).^4).^2.*exp(-(y-fxd[6]).^2/fxd[7]^2) 
     
     
-    p_all_r = integral(fun2,-inf,inf)
-    p_all_d = integral(fun4,-inf,inf)
+    p_all_r = quadgk(fun2,-Inf,Inf)[1]
+    p_all_d = quadgk(fun4,-Inf,Inf)[1]
     
     atol = 1d-7
     
     for i in 1:n
         if u_r[i] >= l_r[i]
-            p1r[i] = integral(fun1,-inf,l_r[i]-y_r[i])
-            p2r[i] = integral(fun1,l_r[i]-y_r[i],l_r[i])
-            p5r[i] = integral(fun1,u_r[i],u_r[i]+y_r[i])
-            p6r[i] = integral(fun1,u_r[i]+y_r[i],inf)
+            p1r[i] = quadgk(fun1,-Inf,l_r[i]-y_r[i])[1]
+            p2r[i] = quadgk(fun1,l_r[i]-y_r[i],l_r[i])[1]
+            p5r[i] = quadgk(fun1,u_r[i],u_r[i]+y_r[i])[1]
+            p6r[i] = quadgk(fun1,u_r[i]+y_r[i],Inf)[1]
             p3r[i] = max(0,1 - p1r[i] - p2r[i] - p5r[i] - p6r[i])
             
-            g1r[i] = integral(fun2,-inf,l_r[i]-y_r[i])
-            g2r[i] = integral(fun2,l_r[i]-y_r[i],l_r[i])
-            g5r[i] = integral(fun2,u_r[i],u_r[i]+y_r[i])
-            g6r[i] = integral(fun2,u_r[i]+y_r[i],inf)
+            g1r[i] = quadgk(fun2,-Inf,l_r[i]-y_r[i])[1]
+            g2r[i] = quadgk(fun2,l_r[i]-y_r[i],l_r[i])[1]
+            g5r[i] = quadgk(fun2,u_r[i],u_r[i]+y_r[i])[1]
+            g6r[i] = quadgk(fun2,u_r[i]+y_r[i],Inf)[1]
             g3r[i] = max(0,p_all_r - g1r[i] - g2r[i] - g5r[i] - g6r[i])
             
             e2r[i] = g2r[i]/max(p2r[i],atol)
@@ -94,16 +96,16 @@ function myfun_ttl(x)
         end
     
         if u_d[i] >= l_d[i]
-            p1d[i] = integral(fun3,-inf,l_d[i]-y_d[i])
-            p2d[i] = integral(fun3,l_d[i]-y_d[i],l_d[i])
-            p5d[i] = integral(fun3,u_d[i],u_d[i]+y_d[i])
-            p6d[i] = integral(fun3,u_d[i]+y_d[i],inf)
+            p1d[i] = quadgk(fun3,-Inf,l_d[i]-y_d[i])[1]
+            p2d[i] = quadgk(fun3,l_d[i]-y_d[i],l_d[i])[1]
+            p5d[i] = quadgk(fun3,u_d[i],u_d[i]+y_d[i])[1]
+            p6d[i] = quadgk(fun3,u_d[i]+y_d[i],Inf)[1]
             p3d[i] = max(0,1 - p1d[i] - p2d[i] - p5d[i] - p6d[i])
             
-            g1d[i] = integral(fun4,-inf,l_d[i]-y_d[i])
-            g2d[i] = integral(fun4,l_d[i]-y_d[i],l_d[i])
-            g5d[i] = integral(fun4,u_d[i],u_d[i]+y_d[i])
-            g6d[i] = integral(fun4,u_d[i]+y_d[i],inf)
+            g1d[i] = quadgk(fun4,-Inf,l_d[i]-y_d[i])[1]
+            g2d[i] = quadgk(fun4,l_d[i]-y_d[i],l_d[i])[1]
+            g5d[i] = quadgk(fun4,u_d[i],u_d[i]+y_d[i])[1]
+            g6d[i] = quadgk(fun4,u_d[i]+y_d[i],Inf)[1]
             g3d[i] = max(0,p_all_d - g1d[i] - g2d[i] - g5d[i] - g6d[i])
             
             e2d[i] = g2d[i]/max(p2d[i],atol)
@@ -135,7 +137,7 @@ function myfun_ttl(x)
         end
         
         if u_d[i] >= l_d[i]
-            v_d_grid[i] =(p6d[i])*(lambda*a_grid[i]+beta*v_r)-g6d[i]+(p5d[i])*(-abs(u_d[i])+(1+beta)*lambda*a_grid[i]-beta*ecost_d+beta^2*v_0) -beta*g5d[i]+(p3d[i])*((1+beta)*lambda*a_grid[i]-beta*ecost_d+beta^2*v_0)-(1+beta)*g3d[i]...+(p2d[i])*(-abs(l_d[i])+(1+beta)*lambda*a_grid[i]-beta*ecost_d+beta^2*v_0)-beta*g2[i]+(p1d[i])*(lambda*a_grid[i]+beta*v_r)-g1d[i]
+            v_d_grid[i] =(p6d[i])*(lambda*a_grid[i]+beta*v_r)-g6d[i]+(p5d[i])*(-abs(u_d[i])+(1+beta)*lambda*a_grid[i]-beta*ecost_d+beta^2*v_0) -beta*g5d[i]+(p3d[i])*((1+beta)*lambda*a_grid[i]-beta*ecost_d+beta^2*v_0)-(1+beta)*g3d[i].+(p2d[i])*(-abs(l_d[i])+(1+beta)*lambda*a_grid[i]-beta*ecost_d+beta^2*v_0)-beta*g2[i]+(p1d[i])*(lambda*a_grid[i]+beta*v_r)-g1d[i]
         else
             v_d_grid[i] = -p_all_d+lambda*a_grid[i]+beta*v_r
         end      
@@ -143,11 +145,10 @@ function myfun_ttl(x)
     
     f[1] = sum(v_d_grid.*pdf_d) - v_d
     f[2] = sum(v_r_grid.*pdf_r) - v_r
-    
-    f(3:3+n-1)       = f1_grid
-    f(3+n:3+2*n-1)   = f2_grid
-    f(3+2*n:3+3*n-1) = f3_grid
-    f(3+3*n:3+4*n-1) = f4_grid
+    f[3:3+n-1]       = f1_grid
+    f[3+n:3+2*n-1]   = f2_grid
+    f[3+2*n:3+3*n-1] = f3_grid
+    f[3+3*n:3+4*n-1] = f4_grid
     
     return f
 end
