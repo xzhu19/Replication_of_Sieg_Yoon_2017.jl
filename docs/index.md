@@ -12,9 +12,12 @@ Authors: Agathe Denis (@agathedenis), Victor Ho (@vho97) and Xuan Zhu (@xzhu19)
 
 Create pages: Why this paper, Summary of the paper, Replication results at a glance, Detailed replication results
 
-<a href="./why-this-paper"> Why this paper? </a> 
+[Why this paper?](/why-this-paper)
 
-<a href="./article-summary"> Article Summary </a> 
+[Article Summary](/article-summary)  
+
+
+
 ```@autodocs
 Modules = [testdocs]
 ```
