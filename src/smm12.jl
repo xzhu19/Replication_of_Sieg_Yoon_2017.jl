@@ -3,10 +3,11 @@ module smm12
 include("./src/Replication_of_Sieg_Yoon_2017.jl")
 include("./src/myfun_ntl2.jl")
 include("./src/find_standard_ttl.jl")
-using. Replication_of_Sieg_Yoon_2017, .fun_myfun_ntl2 .find_standard_ttl
+using .Replication_of_Sieg_Yoon_2017, .fun_myfun_ntl2 .find_standard_ttl
 
 num_sim = 10000
 
+function smm12(x)
 
 if op_model == 1
     lambda = x(3)
@@ -81,17 +82,17 @@ ct2 = 1
 ct3 = 1
 ct4 = 1
 
-incumbent[1,:] = 0;
-party[1,:] = 1;
+incumbent[1,:] = 0
+party[1,:] = 1
 
 for i in 1:num_sim
     
     if incumbent[i,1] == 0
         
        if party[i,:]==1
-           rho[i] = rho_d[ct1];
-           a[i] = a_d[ct1];
-           ct1 = ct1+1;
+           rho[i] = rho_d[ct1]
+           a[i] = a_d[ct1]
+           ct1 = ct1+1
                           
            if (l_d[a[i]]>u_d[a[i]]) || (rho[i]<l_d[a[i]]-y_d[a[i]]) || (rho[i]>u_d[a[i]]+y_d[a[i]])
                x[i] = rho[i]
@@ -177,7 +178,7 @@ p5v = reshape(p5,[4*num_sim,1])
 
 partyv = reshape(party[1:num_sim,:],[4*num_sim,1])
 election_number1 = 1*(incumbent[1:num_sim,:]==0 & incumbent[2:num_sim+1,:]==1 ) + 2*(incumbent[1:num_sim,:]==1 )+3*(incumbent[1:num_sim,:]==0 & incumbent[2:num_sim+1,:]==0)
-election_number = reshape(election_number1,[4*num_sim,1]);
+election_number = reshape(election_number1,[4*num_sim,1])
 
 datav = [p1v p2v p3v p4v p5v]
 for i=1:5:
@@ -195,7 +196,7 @@ end
 
 share_all_sim= zeros(3,4)   
 
-for i=1:3    
+for i in 1:3    
     ps = datav[:,i+2]
     std4 = std(ps)
 
@@ -219,7 +220,7 @@ end
 g= zeros(9,2)
 
 for j in 1:2
-    id_last_all = sum(partyv==j & election_number~=2 )
+    id_last_all = sum(partyv==j & election_number!=2 )
     id_ext_all = sum(partyv==j & election_number==3 )
     g[j,2] = id_ext_all/id_last_all
 end
@@ -233,7 +234,7 @@ g[3,2] = p_d
 
 
 #moments to identify the benefit of holding office
-ct = 3;
+ct = 3
 g[ct+1,1] = std_1[1,1]/std_2[1,1]
 g[ct+2,1] = std_1[1,2]/std_2[1,2]
 
@@ -268,18 +269,18 @@ if op_print_results == 1
     display(g[4:5,:])
     display(g[3,:])
 
-    pr1_r = linspace(0,1,n_app)
-    pr1_d = linspace(0,1,n_app)
+    pr1_r = range(0,1, length= n_app)
+    pr1_d = range(0,1, length= n_app)
 
-    pr2_r = linspace(0,1,n_app)
-    pr2_d = linspace(0,1,n_app)
+    pr2_r = range(0,1, length= n_app)
+    pr2_d = range(0,1, length= n_app)
 
 
-    for i=1:n_app
-        pr1_r[i] = integral(fun1,l_r[i],u_r[i])
-        pr1_d[i] = integral(fun3,l_d[i],u_d[i])
-        pr2_r[i] = integral(fun1,l_r[i]-y_r[i],u_r[i]+y_r[i])-pr1_r[i]
-        pr2_d[i] = integral(fun3,l_d[i]-y_d[i],u_d[i]+y_d[i])-pr1_d[i] 
+    for i in 1:n_app
+        pr1_r[i] = quadgk(fun1,l_r[i],u_r[i])[1]
+        pr1_d[i] = quadgk(fun3,l_d[i],u_d[i])[1]
+        pr2_r[i] = quadgk(fun1,l_r[i]-y_r[i],u_r[i]+y_r[i])-pr1_r[i][1]
+        pr2_d[i] = quadgk(fun3,l_d[i]-y_d[i],u_d[i]+y_d[i])-pr1_d[i][1]git  
     end
 
    
