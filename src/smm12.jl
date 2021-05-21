@@ -7,6 +7,27 @@ using .Replication_of_Sieg_Yoon_2017, .fun_myfun_ntl2 .find_standard_ttl
 
 num_sim = 10000
 
+
+global election_number weight
+global num_sim n_app a_grid p_d 
+global op_print_results op_thirdstage op_policyexp op_valuefunction
+# model parameters
+global y_d y_r ecost_d ecost_r lambda sigma_pd
+global mu_d mu_r mu2_d mu2_r   # factor loadings
+# density estimate
+global t3 # Grids of density estimate
+global fxr fxd                 # SNP Approximation of kxd kxr
+global pdf_d pdf_r cdf_d cdf_r # Discretization of kad kar
+global sigr sigd               # Normal Approximation of ker ked
+
+global u_d l_d u_r l_r
+# moments
+global std_1 std_2 std_last 
+global d_share r_share share_all op_model
+
+
+
+
 function smm12(x)
 
     if op_model == 1
